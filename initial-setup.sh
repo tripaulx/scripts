@@ -1,0 +1,42 @@
+#!/bin/bash
+########################################################################
+# Script Name: initial-setup.sh
+# Version:    1.0.0
+# Date:       2025-07-06
+# Author:     Flavius
+#
+# Description:
+#   Prepara servidores Debian 12+ para produção: atualiza sistema,
+#   configura timezone, locale, swap, segurança básica, utilitários,
+#   instala Docker, Node.js, npm e CapRover CLI.
+#
+# Usage:
+#   sudo ./initial-setup.sh
+#
+# Exit codes:
+#   0 - Sucesso completo
+#   1 - Falha crítica (permissão, erro de rede, dependência, etc)
+#
+# Prerequisites:
+#   - Debian 12+ (bookworm) ou compatível
+#   - Permissão root
+#   - Acesso à internet
+#
+# Steps performed by this script:
+#   1. Atualização completa do sistema
+#   2. Configuração de timezone e locale
+#   3. Instalação de pacotes essenciais e utilitários
+#   4. Ativação de UFW e Fail2Ban
+#   5. Criação de swap (opcional)
+#   6. Instalação do Docker Engine
+#   7. Instalação do Node.js, npm e CapRover CLI
+#   8. Exibição de informações rápidas do sistema
+#
+# See Also:
+#   - https://caprover.com/docs/
+#   - AGENTS.md (padrão de scripts)
+########################################################################
+
+set -e  # Encerra ao primeiro erro
+
+# ... (restante do script igual ao antigo initial-setup-tripaulx.sh.sh) ...

@@ -15,7 +15,7 @@
 # Usage:
 #   # Fluxo recomendado para novo servidor:
 #   # 1. Execute o script de preparação inicial:
-#   sudo ./initial-setup-tripaulx.sh.sh
+#   sudo ./initial-setup.sh
 #   # 2. Exemplo de uso automatizado com setup inicial via CapRover CLI:
 #   export CAPROVER_ADMIN_PASS=suasenha
 #   export CAPROVER_ROOT_DOMAIN=seudominio.com

@@ -1,4 +1,4 @@
-# Automação CapRover & Setup tripaulX
+# Automação CapRover & Setup 
 
 > **Compatibilidade:**
 > Scripts projetados e testados para **Debian 12+** e **macOS** apenas. Não há garantia de funcionamento em outras distribuições ou sistemas.
@@ -21,7 +21,7 @@ cd scripts
 Se ao rodar um script aparecer `Permission denied`, torne-o executável:
 
 ```sh
-chmod +x initial-setup-tripaulx.sh.sh setup-caprover.sh
+chmod +x initial-setup.sh setup-caprover.sh
 ```
 
 Ou para todos os scripts:
@@ -33,7 +33,7 @@ chmod +x *.sh*
 3. **Preparação Inicial do Servidor**  
    Execute o script de preparação para garantir um sistema atualizado e pronto:
    ```bash
-   sudo ./initial-setup-tripaulx.sh.sh
+   sudo ./initial-setup.sh
    ```
    > Dica: Este script pode incluir atualizações, timezone, swap, SSH seguro, etc.
 

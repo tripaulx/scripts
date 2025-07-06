@@ -69,13 +69,13 @@ Todo script deve começar com um bloco de cabeçalho bem estruturado, incluindo:
 ## 6. Exemplo de Cabeçalho Completo
 ```bash
 ########################################################################
-# Script Name: setup-caprover.sh
+# Script Name: initial-setup.sh
 # Version:    1.0.0
 # Date:       2025-07-06
 # Author:     Flavius
 #
 # Description:
-#   Automação robusta da reinstalação e configuração do CapRover
+#   Automação robusta da reinstalação e configuração do ambiente
 #   em servidores Debian 12+. Inclui diagnóstico, limpeza, backup,
 #   validação de portas, execução do container e automação do wizard.
 #
