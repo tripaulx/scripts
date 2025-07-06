@@ -3,7 +3,7 @@
 # Script Name: initial-setup.sh
 # Version:    1.0.0
 # Date:       2025-07-06
-# Author:     Flavius
+# Author:     Flavio Almeida Paulino - Tribeca Digital
 #
 # Description:
 #   Prepara servidores Debian 12+ para produção: atualiza sistema,

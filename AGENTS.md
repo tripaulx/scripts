@@ -72,7 +72,7 @@ Todo script deve começar com um bloco de cabeçalho bem estruturado, incluindo:
 # Script Name: initial-setup.sh
 # Version:    1.0.0
 # Date:       2025-07-06
-# Author:     Flavius
+# Author:     Flavio Almeida Paulino - Tribeca Digital
 #
 # Description:
 #   Automação robusta da reinstalação e configuração do ambiente
