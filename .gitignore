@@ -43,6 +43,9 @@ node_modules/
 venv/
 __pycache__/
 
+# Checklist de segurança (não versionar)
+SECURITY_CHECKLIST.md
+
 # Evite subir arquivos de configuração pessoal
 *.local
 *.history
