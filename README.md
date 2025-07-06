@@ -1,4 +1,7 @@
-# Automação Completa do Setup CapRover
+# Automação CapRover & Setup tripaulX
+
+> **Compatibilidade:**
+> Scripts projetados e testados para **Debian 12+** e **macOS** apenas. Não há garantia de funcionamento em outras distribuições ou sistemas.
 
 Este repositório contém scripts para provisionamento, diagnóstico, limpeza e automação total da instalação do CapRover em servidores Debian 12+ (ou compatíveis).
 
