@@ -4,14 +4,37 @@ Este repositório contém scripts para provisionamento, diagnóstico, limpeza e 
 
 ## Fluxo Recomendado
 
-1. **Preparação Inicial do Servidor**  
+### Como usar
+
+1. Clone este repositório:
+
+```sh
+git clone https://github.com/tripaulx/scripts.git
+cd scripts
+```
+
+2. Permissão de execução (importante!)
+
+Se ao rodar um script aparecer `Permission denied`, torne-o executável:
+
+```sh
+chmod +x initial-setup-tripaulx.sh.sh setup-caprover.sh
+```
+
+Ou para todos os scripts:
+
+```sh
+chmod +x *.sh*
+```
+
+3. **Preparação Inicial do Servidor**  
    Execute o script de preparação para garantir um sistema atualizado e pronto:
    ```bash
    sudo ./initial-setup-tripaulx.sh.sh
    ```
    > Dica: Este script pode incluir atualizações, timezone, swap, SSH seguro, etc.
 
-2. **Setup Automatizado do CapRover**  
+4. **Setup Automatizado do CapRover**  
    Use o script principal para instalar, limpar ambiente Docker e configurar CapRover totalmente automatizado:
    ```bash
    export CAPROVER_ADMIN_PASS=suasenha
