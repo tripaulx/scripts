@@ -21,13 +21,13 @@ cd scripts
 Se ao rodar um script aparecer `Permission denied`, torne-o executável:
 
 ```sh
-chmod +x initial-setup.sh setup-caprover.sh
+chmod +x initial-setup.sh setup-caprover.sh validate-postreboot.sh zero-initial.sh
 ```
 
 Ou para todos os scripts:
 
 ```sh
-chmod +x *.sh*
+chmod +x *.sh
 ```
 
 3. **Preparação Inicial do Servidor**  
@@ -37,7 +37,21 @@ chmod +x *.sh*
    ```
    > Dica: Este script pode incluir atualizações, timezone, swap, SSH seguro, etc.
 
-4. **Setup Automatizado do CapRover**  
+4. **Validação pós-reboot**  
+   Após reiniciar o servidor, valide se o ambiente está saudável:
+   ```bash
+   sudo ./validate-postreboot.sh
+   ```
+   > Esse script checa serviços essenciais, swap, espaço em disco, conectividade e recomenda snapshot/backup antes de rodar scripts destrutivos.
+
+5. **Hardening e diagnóstico de segurança**  
+   Antes de expor à internet, rode o diagnóstico de segurança:
+   ```bash
+   sudo ./zero-initial.sh
+   ```
+   > Diagnostica portas abertas, configurações do SSH, UFW, updates e recomendações de hardening.
+
+6. **Setup Automatizado do CapRover**  
    Use o script principal para instalar, limpar ambiente Docker e configurar CapRover totalmente automatizado:
    ```bash
    export CAPROVER_ADMIN_PASS=suasenha
@@ -86,6 +100,7 @@ chmod +x *.sh*
 ## Referências
 - [CapRover Documentação Oficial](https://caprover.com/docs/)
 - [CapRover Troubleshooting](https://caprover.com/docs/troubleshooting.html)
+- Scripts auxiliares: `validate-postreboot.sh` (diagnóstico pós-reboot), `zero-initial.sh` (hardening e diagnóstico de segurança)
 
 ---
 

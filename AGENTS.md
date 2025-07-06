@@ -106,6 +106,35 @@ Todo script deve começar com um bloco de cabeçalho bem estruturado, incluindo:
 ########################################################################
 ```
 
+## Execução Manual Rápida dos Scripts de Diagnóstico e Segurança
+
+Após provisionar ou atualizar o servidor, execute manualmente:
+
+```sh
+# Torne todos os scripts executáveis (se necessário)
+chmod +x initial-setup.sh setup-caprover.sh validate-postreboot.sh zero-initial.sh
+
+# 1. Preparação inicial do sistema
+sudo ./initial-setup.sh
+
+# 2. (Opcional) Reinicie o servidor
+sudo reboot
+
+# 3. Diagnóstico pós-reboot
+sudo ./validate-postreboot.sh
+
+# 4. Diagnóstico e hardening de segurança
+sudo ./zero-initial.sh
+
+# 5. Setup CapRover automatizado
+export CAPROVER_ADMIN_PASS=suasenha
+export CAPROVER_ROOT_DOMAIN=seudominio.com
+export CAPROVER_ADMIN_EMAIL=seu@email.com
+sudo ./setup-caprover.sh --force
+```
+
+> Consulte o README.md para detalhes de cada etapa e recomendações de segurança.
+
 ## 7. Orientações para Agentes (IA ou Humanos)
 - Siga SEMPRE este padrão ao criar ou alterar scripts.
 - Prefira clareza e robustez à concisão excessiva.
