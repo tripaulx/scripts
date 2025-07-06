@@ -31,20 +31,108 @@ banner() {
 
 banner "Diagnóstico Pós-Reboot"
 
+# Função para configurar o SSH para log apropriado
+configure_ssh_logging() {
+  echo -e "\n[INFO] Configurando logs do SSH..."
+  if ! grep -q "^SyslogFacility AUTH" /etc/ssh/sshd_config; then
+    echo "SyslogFacility AUTH" | sudo tee -a /etc/ssh/sshd_config > /dev/null
+    echo "LogLevel INFO" | sudo tee -a /etc/ssh/sshd_config > /dev/null
+    echo "[SUCESSO] Configuração do SSH atualizada"
+    sudo systemctl restart sshd
+    return 0
+  else
+    echo "[INFO] Configuração do SSH já está correta"
+    return 1
+  fi
+}
+
+# Função para configurar o Fail2Ban
+configure_fail2ban() {
+  echo -e "\n[INFO] Configurando o Fail2Ban..."
+  
+  # Criar diretório de filtros personalizados se não existir
+  sudo mkdir -p /etc/fail2ban/filter.d
+
+  # Criar filtro personalizado para systemd
+  echo -e "[INFO] Configurando filtro personalizado para systemd..."
+  sudo bash -c 'cat > /etc/fail2ban/filter.d/sshd-systemd.conf' << 'EOL'
+[INCLUDES]
+before = common.conf
+
+[Definition]
+_daemon = sshd
+failregex = ^%(__prefix_line)s(?:error: PAM: )?[aA]uthentication (?:failure|error|failed).* for (?:illegal user )?(?:user )?.*(?: from <HOST>(?: port \d+)?(?: ssh\d*)?(?: on \S+)?(?: port \d+)?(?: \S+)?)?\s*$
+            ^%(__prefix_line)s(?:error: PAM: )?User not known to the underlying authentication module for .* from <HOST>\s*$
+            ^%(__prefix_line)sFailed (?:password|publickey) for (?:invalid user |illegal user )?.* from <HOST>(?: port \d+)?(?: ssh\d*)?\s*$
+            ^%(__prefix_line)sReceived disconnect from <HOST>: 3: \\S+: (?:authentication|user) failed\s*$
+
+ignoreregex =
+EOL
+
+  # Configuração do jail para usar systemd
+  echo -e "[INFO] Configurando jail para usar systemd..."
+  sudo bash -c 'cat > /etc/fail2ban/jail.d/sshd.conf' << 'EOL'
+[sshd]
+enabled = true
+port = ssh
+filter = sshd-systemd
+backend = systemd
+maxretry = 3
+bantime = 1h
+findtime = 600
+ignoreip = 127.0.0.1/8 ::1
+EOL
+
+  # Ajustar permissões
+  sudo chown -R root:root /etc/fail2ban
+  sudo chmod -R 755 /etc/fail2ban
+  
+  echo -e "[SUCESSO] Configuração do Fail2Ban atualizada"
+  return 0
+}
+
 # Função para corrigir o Fail2Ban
 fix_fail2ban() {
   echo -e "\n[INFO] Tentando corrigir o Fail2Ban automaticamente..."
-  if [ -f "./fix-fail2ban.sh" ]; then
-    chmod +x ./fix-fail2ban.sh
-    if sudo ./fix-fail2ban.sh; then
-      echo "[SUCESSO] Fail2Ban corrigido com sucesso!"
-      return 0
+  
+  # 1. Parar o serviço
+  sudo systemctl stop fail2ban 2>/dev/null
+  
+  # 2. Configurar SSH
+  configure_ssh_logging
+  
+  # 3. Configurar Fail2Ban
+  configure_fail2ban
+  
+  # 4. Testar configuração
+  echo -e "\n[INFO] Testando configuração do Fail2Ban..."
+  if ! sudo fail2ban-client -t; then
+    echo "[ERRO] Falha na configuração do Fail2Ban" | tee -a "$LOGFILE"
+    return 1
+  fi
+  
+  # 5. Iniciar o serviço
+  echo -e "\n[INFO] Iniciando o serviço Fail2Ban..."
+  sudo systemctl start fail2ban
+  sudo systemctl enable fail2ban
+  
+  # Verificar status
+  if systemctl is-active --quiet fail2ban; then
+    echo -e "\n[SUCESSO] Fail2Ban está rodando com sucesso!"
+    echo -e "\n=== Status do Fail2Ban ==="
+    sudo fail2ban-client status
+    
+    echo -e "\n=== Status da prisão do SSH ==="
+    if sudo fail2ban-client status sshd &>/dev/null; then
+      sudo fail2ban-client status sshd
     else
-      echo "[ERRO] Falha ao corrigir o Fail2Ban automaticamente." | tee -a "$LOGFILE"
-      return 1
+      echo "[AVISO] A prisão do SSH não está ativa. Verifique os logs."
     fi
+    return 0
   else
-    echo "[ERRO] Script de correção do Fail2Ban não encontrado." | tee -a "$LOGFILE"
+    echo "[ERRO] Falha ao iniciar o Fail2Ban" | tee -a "$LOGFILE"
+    echo -e "\n=== Últimas linhas do log do Fail2Ban ==="
+    sudo journalctl -u fail2ban --no-pager -n 20 | tee -a "$LOGFILE"
     return 1
   fi
 }
