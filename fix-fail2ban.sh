@@ -27,11 +27,34 @@ fi
 
 # 3. Criar configuração personalizada para o Fail2Ban
 echo -e "\n${YELLOW}[3/6] Configurando o Fail2Ban...${NC}"
+
+# Criar diretório de filtros personalizados se não existir
+sudo mkdir -p /etc/fail2ban/filter.d
+
+# Criar filtro personalizado para systemd
+echo -e "\n${YELLOW}Configurando filtro personalizado para systemd...${NC}"
+sudo bash -c 'cat > /etc/fail2ban/filter.d/sshd-systemd.conf' << 'EOL'
+[INCLUDES]
+before = common.conf
+
+[Definition]
+_daemon = sshd
+failregex = ^%(__prefix_line)s(?:error: PAM: )?[aA]uthentication (?:failure|error|failed).* for (?:illegal user )?(?:user )?.*(?: from <HOST>(?: port \d+)?(?: ssh\d*)?(?: on \S+)?(?: port \d+)?(?: \S+)?)?\s*$
+            ^%(__prefix_line)s(?:error: PAM: )?User not known to the underlying authentication module for .* from <HOST>\s*$
+            ^%(__prefix_line)sFailed (?:password|publickey) for (?:invalid user |illegal user )?.* from <HOST>(?: port \d+)?(?: ssh\d*)?\s*$
+            ^%(__prefix_line)sReceived disconnect from <HOST>: 3: \\S+: (?:authentication|user) failed\s*$
+
+ignoreregex =
+EOL
+
+# Configuração do jail para usar systemd
+echo -e "${YELLOW}Configurando jail para usar systemd...${NC}"
 sudo bash -c 'cat > /etc/fail2ban/jail.d/sshd.conf' << 'EOL'
 [sshd]
 enabled = true
 port = ssh
-backend = auto
+filter = sshd-systemd
+backend = systemd
 maxretry = 3
 bantime = 1h
 findtime = 600
