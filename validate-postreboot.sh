@@ -31,8 +31,26 @@ banner() {
 
 banner "Diagnóstico Pós-Reboot"
 
+# Função para corrigir o Fail2Ban
+fix_fail2ban() {
+  echo -e "\n[INFO] Tentando corrigir o Fail2Ban automaticamente..."
+  if [ -f "./fix-fail2ban.sh" ]; then
+    chmod +x ./fix-fail2ban.sh
+    if sudo ./fix-fail2ban.sh; then
+      echo "[SUCESSO] Fail2Ban corrigido com sucesso!"
+      return 0
+    else
+      echo "[ERRO] Falha ao corrigir o Fail2Ban automaticamente." | tee -a "$LOGFILE"
+      return 1
+    fi
+  else
+    echo "[ERRO] Script de correção do Fail2Ban não encontrado." | tee -a "$LOGFILE"
+    return 1
+  fi
+}
+
 # Checagem dos principais serviços
-for svc in docker ufw fail2ban; do
+for svc in docker ufw; do
   echo -n "[INFO] Checando serviço $svc... "
   if systemctl is-active --quiet $svc; then
     echo "OK"
@@ -41,6 +59,27 @@ for svc in docker ufw fail2ban; do
     echo "[ERRO] Serviço $svc não está ativo!" | tee -a "$LOGFILE"
   fi
 done
+
+# Verificação especial para o Fail2Ban com opção de correção
+echo -n "[INFO] Checando serviço fail2ban... "
+if systemctl is-active --quiet fail2ban; then
+  echo "OK"
+else
+  echo "FALHOU"
+  echo "[ERRO] Serviço fail2ban não está ativo!" | tee -a "$LOGFILE"
+  
+  # Pergunta se deseja corrigir automaticamente
+  if [ -t 0 ]; then  # Se estiver em um terminal interativo
+    read -p "Deseja tentar corrigir o Fail2Ban automaticamente? [s/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Ss]$ ]]; then
+      fix_fail2ban
+    fi
+  else
+    # Em modo não interativo, tenta corrigir automaticamente
+    fix_fail2ban
+  fi
+fi
 
 # Checa binários essenciais
 for bin in node npm caprover; do
