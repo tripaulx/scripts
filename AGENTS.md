@@ -53,12 +53,19 @@ Todo script deve começar com um bloco de cabeçalho bem estruturado, incluindo:
 - Sempre cheque pré-requisitos antes de executar comandos sensíveis.
 - Ao detectar erro crítico, imprima mensagem clara e finalize com exit code adequado.
 - Nunca sobrescreva variáveis de ambiente ou configurações sem checar o estado atual.
+- Em scripts interativos, sempre peça confirmação antes de fazer alterações críticas.
+- Mantenha um log detalhado de todas as operações realizadas.
+- Implemente rollback ou backup automático antes de alterações destrutivas.
 
 ## 4. Estrutura de Código e Boas Práticas
 - Separe claramente blocos de diagnóstico, instalação, configuração, limpeza, etc.
 - Use funções para tarefas reutilizáveis ou blocos longos.
 - Prefira sempre mapeamento explícito de portas em comandos Docker.
 - Rotacione logs e registre tudo relevante para auditoria.
+- Em scripts interativos, forneça valores padrão seguros e claros.
+- Sempre valide entradas do usuário, especialmente em scripts de segurança.
+- Documente claramente os parâmetros e opções de linha de comando.
+- Mantenha consistência na formatação de mensagens e logs.
 
 ## 5. Manutenção e Evolução
 - Ao alterar scripts, sempre atualize o cabeçalho e a seção de uso.
@@ -112,7 +119,7 @@ Após provisionar ou atualizar o servidor, execute manualmente:
 
 ```sh
 # Torne todos os scripts executáveis (se necessário)
-chmod +x initial-setup.sh setup-caprover.sh validate-postreboot.sh zero-initial.sh
+chmod +x *.sh
 
 # 1. Preparação inicial do sistema
 sudo ./initial-setup.sh
@@ -123,23 +130,45 @@ sudo reboot
 # 3. Diagnóstico pós-reboot
 sudo ./validate-postreboot.sh
 
-# 4. Diagnóstico e hardening de segurança
+# 4. Hardening de segurança interativo
+sudo ./zerup-scurity-setup.sh
+
+# 5. (Opcional) Apenas diagnóstico de segurança
 sudo ./zero-initial.sh
 
-# 5. Setup CapRover automatizado
+# 6. Setup CapRover automatizado
 export CAPROVER_ADMIN_PASS=suasenha
 export CAPROVER_ROOT_DOMAIN=seudominio.com
 export CAPROVER_ADMIN_EMAIL=seu@email.com
 sudo ./setup-caprover.sh --force
 ```
 
-> Consulte o README.md para detalhes de cada etapa e recomendações de segurança.
+### Modo Não-Interativo (Avançado)
+Para automação, use o modo não-interativo com variáveis de ambiente:
+
+```sh
+# Exemplo: Configuração mínima não-interativa
+sudo SSH_PORT=2222 SSH_USER=admin ./zerup-scurity-setup.sh --non-interactive
+
+# Exemplo: Configuração completa não-interativa
+sudo SSH_PORT=2222 \
+  SSH_USER=admin \
+  ENABLE_UPDATES=true \
+  ENABLE_FAIL2BAN=true \
+  ENABLE_UFW=true \
+  ./zerup-scurity-setup.sh --non-interactive
+```
+
+> Consulte o README.md para detalhes de cada etapa, opções e recomendações de segurança.
 
 ## 7. Orientações para Agentes (IA ou Humanos)
 - Siga SEMPRE este padrão ao criar ou alterar scripts.
 - Prefira clareza e robustez à concisão excessiva.
 - Priorize sempre a experiência do usuário humano.
 - Ao automatizar, trate exceções e informe claramente o status de cada etapa.
+- Em scripts interativos, sempre dê ao usuário a opção de pular etapas.
+- Documente claramente os requisitos e dependências.
+- Mantenha a compatibilidade com versões anteriores quando possível.
 - Atualize este guia se novos padrões forem adotados.
 
 ---

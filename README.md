@@ -21,12 +21,6 @@ cd scripts
 Se ao rodar um script aparecer `Permission denied`, torne-o executável:
 
 ```sh
-chmod +x initial-setup.sh setup-caprover.sh validate-postreboot.sh zero-initial.sh
-```
-
-Ou para todos os scripts:
-
-```sh
 chmod +x *.sh
 ```
 
@@ -44,12 +38,19 @@ chmod +x *.sh
    ```
    > Esse script checa serviços essenciais, swap, espaço em disco, conectividade e recomenda snapshot/backup antes de rodar scripts destrutivos.
 
-5. **Hardening e diagnóstico de segurança**  
-   Antes de expor à internet, rode o diagnóstico de segurança:
+5. **Hardening de Segurança**  
+   Execute o assistente interativo de hardening:
+   ```bash
+   sudo ./zerup-scurity-setup.sh
+   ```
+   > Configurações de segurança interativas, incluindo SSH, UFW, Fail2Ban e mais.
+
+6. **Diagnóstico de Segurança (Opcional)**  
+   Para verificar o estado de segurança sem fazer alterações:
    ```bash
    sudo ./zero-initial.sh
    ```
-   > Diagnostica portas abertas, configurações do SSH, UFW, updates e recomendações de hardening.
+   > Apenas diagnóstico (não faz alterações) de portas abertas, configurações do SSH, UFW, etc.
 
 6. **Setup Automatizado do CapRover**  
    Use o script principal para instalar, limpar ambiente Docker e configurar CapRover totalmente automatizado:
@@ -62,7 +63,76 @@ chmod +x *.sh
    - **--force**: Executa sem confirmações interativas (ideal para automação/CI).
    - As variáveis de ambiente permitem configurar domínio, senha e e-mail do admin automaticamente no wizard inicial via CLI.
 
-## O que o setup-caprover.sh faz
+## Scripts Principais
+
+### zerup-scurity-setup.sh
+Script interativo de hardening de segurança completo que implementa as melhores práticas para servidores Linux em produção, com confirmação em cada etapa.
+
+**Funcionalidades principais:**
+- 🔒 **SSH Seguro**
+  - Troca interativa da porta SSH (sugere porta aleatória)
+  - Desativação segura do login root (verifica usuário alternativo)
+  - Configuração de autenticação por chave
+  - Timeouts e limitações de tentativas de login
+
+- 🛡️ **Firewall (UFW)**
+  - Configuração interativa de regras restritivas
+  - Abertura apenas das portas necessárias (SSH, HTTP, HTTPS)
+  - Ativação de logging
+  - Instalação opcional do UFW se não estiver presente
+
+- 🛑 **Proteção contra Ataques**
+  - Instalação e configuração interativa do Fail2Ban
+  - Proteção contra força bruta
+  - Configurações personalizadas de banimento
+  - Instalação opcional se não estiver presente
+
+- 🔍 **Validações de Segurança**
+  - Verificação de usuários não-root antes de desabilitar root
+  - Backup automático de arquivos de configuração
+  - Prevenção contra bloqueio acidental
+  - Validação de dependências
+
+- 🔄 **Manutenção**
+  - Atualizações automáticas de segurança (opcional)
+  - Limpeza de pacotes desnecessários (opcional)
+  - Relatório detalhado pós-instalação
+
+**Uso Interativo (Recomendado):**
+```bash
+# Modo interativo (perguntará confirmação para cada etapa)
+sudo ./zerup-scurity-setup.sh
+```
+
+**Modo Não-Interativo (Avançado):**
+```bash
+# Modo não-interativo com parâmetros
+sudo ./zerup-scurity-setup.sh --port=2222 --user=admin --non-interactive
+```
+
+**Opções:**
+- `--port=PORTA`: Especifica a porta SSH personalizada (padrão: aleatória)
+- `--user=USUARIO`: Define o usuário para acesso SSH (opcional, será perguntado se não informado)
+- `--non-interactive`: Executa sem confirmações (use com cautela)
+
+**Fluxo Típico:**
+1. Pergunta sobre atualização do sistema
+2. Configuração do SSH com confirmação de porta e usuário
+3. Configuração do UFW com opção de instalação
+4. Configuração do Fail2Ban com opção de instalação
+5. Atualizações automáticas (opcional)
+6. Limpeza de sistema (opcional)
+7. Relatório final detalhado
+
+**Segurança:**
+- Todas as alterações são confirmadas antes da execução
+- Backups automáticos dos arquivos modificados
+- Verificação de usuário alternativo antes de desabilitar root
+- Log detalhado em `/var/log/zerup-security-*.log`
+
+---
+
+### setup-caprover.sh
 - Diagnóstico do sistema e Docker
 - Backup e validação do volume `/captain`
 - Limpeza agressiva de containers, volumes, redes e serviços Docker antigos
