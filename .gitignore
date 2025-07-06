@@ -1,0 +1,48 @@
+# Evita arquivos e pastas do macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Arquivos temporários de editor
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+
+# Arquivos de log e cache
+*.log
+*.out
+*.err
+
+# Backup do shell
+*.sh~
+
+# Diretórios ocultos genéricos
+.cache/
+.idea/
+.vscode/
+.env
+
+# Arquivos de sistema
+Thumbs.db
+Desktop.ini
+
+# Ignorar arquivos sensíveis (ajuste conforme necessidade)
+*.pem
+*.key
+*.crt
+*.env
+
+# Ignorar arquivos de execução local
+node_modules/
+venv/
+__pycache__/
+
+# Evite subir arquivos de configuração pessoal
+*.local
+*.history
