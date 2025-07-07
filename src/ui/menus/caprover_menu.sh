@@ -79,7 +79,9 @@ show_caprover_menu() {
 #
 install_caprover() {
     show_header "INSTALAÇÃO DO CAPROVER"
-    
+
+    "${SCRIPT_DIR}/src/security/core/check_dependencies.sh" --install
+
     if command -v caprover &> /dev/null; then
         show_message "info" "CapRover já está instalado."
         return 0
@@ -97,23 +99,8 @@ install_caprover() {
         return 0
     fi
     
-    # Verificar Docker
-    if ! command -v docker &> /dev/null; then
-        show_message "info" "Docker não encontrado. Instalando..."
-        curl -fsSL https://get.docker.com | sh
-        if [ $? -ne 0 ]; then
-            show_message "error" "Falha ao instalar o Docker."
-            return 1
-        fi
-    fi
-    
-    # Instalar CapRover CLI
-    show_message "info" "Instalando CapRover CLI..."
-    npm install -g caprover
-    if [ $? -ne 0 ]; then
-        show_message "error" "Falha ao instalar o CapRover CLI. Verifique se o Node.js está instalado."
-        return 1
-    fi
+
+    # Dependências já verificadas pelo check_dependencies.sh
     
     # Instalar CapRover
     show_message "info" "Iniciando instalação do CapRover..."

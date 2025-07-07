@@ -860,6 +860,8 @@ check_dependencies() {
 
 # Função principal
 main() {
+    "${SCRIPT_DIR}/src/security/core/check_dependencies.sh" --install
+
     # Verificar se há argumentos de linha de comando
     if [ $# -gt 0 ]; then
         case $1 in
