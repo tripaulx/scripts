@@ -1,3 +1,4 @@
+---
 name: CI
 
 on:
@@ -16,7 +17,9 @@ jobs:
           sudo apt-get install -y shellcheck
       - name: ShellCheck
         run: |
+          set -e
           shellcheck $(git ls-files '*.sh')
       - name: Run integration tests
         run: |
+          set -e
           ./run-tests.sh
