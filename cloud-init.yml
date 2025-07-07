@@ -1,0 +1,54 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - git
+  - jq
+  - curl
+
+runcmd:
+  - mkdir -p /opt/scripts
+  - cd /opt/scripts
+  - git clone https://github.com/tripaulx/scripts.git .
+  - chmod +x main.sh setup harden diagnose
+  - echo "=== Início da Configuração $(date) ===" > /root/setup.log
+  - {
+      echo "\n=== Configuração do Sistema ==="
+      ./setup 2>&1
+      echo "\n=== Hardening de Segurança ==="
+      ./harden 2>&1
+      echo "\n=== Diagnóstico do Sistema ==="
+      ./diagnose 2>&1
+    } | tee -a /root/setup.log
+  - chmod 600 /root/setup.log
+
+final_message: "Configuração inicial concluída! Verifique o arquivo /root/setup.log para detalhes."
+
+# Configuração de mensagem de boas-vindas
+echo_if_exists: |
+  if [ -f /etc/update-motd.d/99-one-click ]; then
+    chmod -x /etc/update-motd.d/99-one-click
+  fi
+
+  cat > /etc/update-motd.d/99-setup-complete << EOL
+#!/bin/sh
+
+# Cores
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo ""
+echo "${GREEN}=== Configuração Automática Concluída ===${NC}"
+echo ""
+echo "${YELLOW}Logs da instalação:${NC}"
+echo "- Configuração: ${YELLOW}sudo cat /root/setup.log${NC}"
+echo ""
+echo "${YELLOW}Scripts disponíveis em:${NC} /opt/scripts"
+echo "- Menu principal: ${YELLOW}cd /opt/scripts && sudo ./main.sh${NC}"
+echo ""
+EOL
+
+  chmod +x /etc/update-motd.d/99-setup-complete
