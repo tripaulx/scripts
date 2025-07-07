@@ -265,13 +265,13 @@ Script interativo de hardening de segurança completo que implementa as melhores
 **Uso Interativo (Recomendado):**
 ```bash
 # Modo interativo (perguntará confirmação para cada etapa)
-sudo ./zerup-scurity-setup.sh
+sudo ./harden/zerup-scurity-setup.sh
 ```
 
 **Modo Não-Interativo (Avançado):**
 ```bash
 # Modo não-interativo com parâmetros
-sudo ./zerup-scurity-setup.sh --port=2222 --user=admin --non-interactive
+sudo ./harden/zerup-scurity-setup.sh --port=2222 --user=admin --non-interactive
 ```
 
 **Opções:**

@@ -238,7 +238,7 @@ sudo reboot
 sudo ./validate-postreboot.sh
 
 # 4. Hardening de segurança interativo
-sudo ./zerup-scurity-setup.sh
+sudo ./harden/zerup-scurity-setup.sh
 
 # 5. (Opcional) Apenas diagnóstico de segurança
 sudo ./zero-initial.sh
@@ -255,7 +255,7 @@ Para automação, use o modo não-interativo com variáveis de ambiente:
 
 ```sh
 # Exemplo: Configuração mínima não-interativa
-sudo SSH_PORT=2222 SSH_USER=admin ./zerup-scurity-setup.sh --non-interactive
+sudo SSH_PORT=2222 SSH_USER=admin ./harden/zerup-scurity-setup.sh --non-interactive
 
 # Exemplo: Configuração completa não-interativa
 sudo SSH_PORT=2222 \
@@ -263,7 +263,7 @@ sudo SSH_PORT=2222 \
   ENABLE_UPDATES=true \
   ENABLE_FAIL2BAN=true \
   ENABLE_UFW=true \
-  ./zerup-scurity-setup.sh --non-interactive
+  ./harden/zerup-scurity-setup.sh --non-interactive
 ```
 
 > Consulte o README.md para detalhes de cada etapa, opções e recomendações de segurança.

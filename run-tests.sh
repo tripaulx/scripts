@@ -123,7 +123,7 @@ test_execution_permissions() {
         "${BASE_DIR}/setup-caprover.sh"
         "${BASE_DIR}/validate-postreboot.sh"
         "${BASE_DIR}/zero-initial.sh"
-        "${BASE_DIR}/zerup-scurity-setup.sh"
+        "${BASE_DIR}/bin/security/harden/zerup-scurity-setup.sh"
     )
     
     for file in "${files[@]}"; do
@@ -155,7 +155,7 @@ test_script_syntax() {
         "${BASE_DIR}/setup-caprover.sh"
         "${BASE_DIR}/validate-postreboot.sh"
         "${BASE_DIR}/zero-initial.sh"
-        "${BASE_DIR}/zerup-scurity-setup.sh"
+        "${BASE_DIR}/bin/security/harden/zerup-scurity-setup.sh"
     )
     
     for script in "${scripts[@]}"; do
