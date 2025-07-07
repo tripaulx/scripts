@@ -134,9 +134,10 @@ validate_username() {
     # Verificar se não termina com hífen ou ponto
     if [[ "$username" =~ [.-]$ ]]; then
         return 1
-    }
+    fi
     
     return 0
+}
 
 # Função para verificar se um comando existe
 command_exists() {
