@@ -123,35 +123,6 @@ chmod +x check-dependencies.sh
 
 Consulte o arquivo [REQUIREMENTS.md](docs/REQUIREMENTS.md) para informações detalhadas sobre cada dependência e instruções de instalação específicas para diferentes distribuições.
 
-## 🏗️ Estrutura do Projeto
-
-O projeto foi organizado em uma estrutura modular para melhor manutenção e extensibilidade:
-
-```
-scripts/
-├── core/                  # Funções e utilitários compartilhados
-│   ├── utils.sh           # Funções utilitárias gerais
-│   ├── validations.sh     # Funções de validação
-│   ├── backup.sh          # Funções de backup e restauração
-│   └── security.sh        # Funções de segurança compartilhadas
-├── modules/              # Módulos de funcionalidades específicas
-│   ├── ssh/              # Configuração segura do SSH
-│   │   ├── ssh.sh        # Funções principais do módulo SSH
-│   │   └── validations.sh # Validações específicas do SSH
-│   ├── ufw/              # Configuração do firewall UFW
-│   │   ├── ufw.sh        # Funções principais do módulo UFW
-│   │   └── validations.sh # Validações específicas do UFW
-│   └── fail2ban/         # Configuração do Fail2Ban
-│       ├── fail2ban.sh   # Funções principais do módulo Fail2Ban
-│       └── validations.sh # Validações específicas do Fail2Ban
-├── main.sh               # Script principal (interface interativa)
-└── scripts/              # Scripts de uso específico
-    ├── initial-setup.sh  # Configuração inicial do servidor
-    ├── setup-caprover.sh # Instalação e configuração do CapRover
-    ├── validate-postreboot.sh # Validação pós-reinicialização
-    ├── zero-initial.sh   # Diagnóstico de segurança
-    └── zerup-scurity-setup.sh # Assistente de hardening de segurança
-```
 
 ## 🛠 Instalação no Debian 12
 
@@ -198,28 +169,28 @@ scripts/
 4. **Preparação Inicial do Servidor**  
    Execute o script de preparação para garantir um sistema atualizado e pronto:
    ```bash
-   sudo ./scripts/initial-setup.sh
+   sudo ./setup
    ```
    > Dica: Este script pode incluir atualizações, timezone, swap, SSH seguro, etc.
 
 5. **Validação pós-reboot**  
    Após reiniciar o servidor, valide se o ambiente está saudável:
    ```bash
-   sudo ./scripts/validate-postreboot.sh
+   sudo ./caprover-validate/validate-postreboot.sh
    ```
    > Esse script checa serviços essenciais, swap, espaço em disco, conectividade e recomenda snapshot/backup antes de rodar scripts destrutivos.
 
 6. **Hardening de Segurança**  
    Execute o assistente interativo de hardening:
    ```bash
-   sudo ./scripts/zerup-scurity-setup.sh
+   sudo ./harden/zerup-scurity-setup.sh
    ```
    > Configurações de segurança interativas, incluindo SSH, UFW, Fail2Ban e mais.
 
 7. **Diagnóstico de Segurança (Opcional)**  
    Para verificar o estado de segurança sem fazer alterações:
    ```bash
-   sudo ./scripts/zero-initial.sh
+   sudo ./diagnose/zero-initial.sh
    ```
    > Apenas diagnóstico (não faz alterações) de portas abertas, configurações do SSH, UFW, etc.
 
@@ -229,7 +200,7 @@ scripts/
    export CAPROVER_ADMIN_PASS=suasenha
    export CAPROVER_ROOT_DOMAIN=seudominio.com
    export CAPROVER_ADMIN_EMAIL=seu@email.com
-   sudo ./scripts/setup-caprover.sh --force
+   sudo ./caprover-setup/setup-caprover.sh --force
    ```
    - **--force**: Executa sem confirmações interativas (ideal para automação/CI).
    - As variáveis de ambiente permitem configurar domínio, senha e e-mail do admin automaticamente no wizard inicial via CLI.
@@ -502,7 +473,7 @@ Se o problema persistir, colete as seguintes informações antes de entrar em co
   tasks:
     - name: Copiar scripts para o servidor
       copy:
-        src: scripts/
+        src: ./
         dest: /opt/security-scripts
         mode: '0755'
     
