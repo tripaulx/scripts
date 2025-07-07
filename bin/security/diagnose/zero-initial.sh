@@ -18,7 +18,7 @@
 #   1 - Vulnerabilidades críticas detectadas
 #
 # Prerequisites:
-#   - Debian 12+ ou macOS
+#   - Debian 12 (Bookworm) ou superior
 #   - Permissão root
 ########################################################################
 

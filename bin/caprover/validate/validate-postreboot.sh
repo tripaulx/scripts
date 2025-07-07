@@ -17,7 +17,7 @@
 #   1 - Algum serviço crítico não está ativo
 #
 # Prerequisites:
-#   - Debian 12+ ou macOS
+#   - Debian 12 (Bookworm) ou superior
 #   - Permissão root
 ########################################################################
 

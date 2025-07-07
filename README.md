@@ -1,71 +1,264 @@
-# Automação CapRover & Setup 
+# Gerenciamento de Servidor Debian 12
 
-> **Compatibilidade:**
-> Scripts projetados e testados para **Debian 12+** e **macOS** apenas. Não há garantia de funcionamento em outras distribuições ou sistemas.
+> **Compatibilidade Exclusiva:**
+> Scripts projetados e testados especificamente para **Debian 12 (Bookworm)**. 
+> ⚠️ Não há suporte para outras versões ou distribuições.
 
-Este repositório contém scripts para provisionamento, diagnóstico, limpeza e automação total da instalação do CapRover em servidores Debian 12+ (ou compatíveis).
+Este repositório contém um conjunto de scripts modulares para gerenciamento de servidores Debian 12, com foco em:
+- 🔒 **Segurança**: Hardening, auditoria e monitoramento
+- 🐋 **CapRover**: Instalação e gerenciamento
+- ⚙️ **Configuração**: Automação de tarefas comuns
+- 🛡️ **Proteção**: Firewall, Fail2Ban e mais
 
-## Fluxo Recomendado
+## 🏗️ Estrutura do Projeto
 
-### Como usar
-
-1. Clone este repositório:
-
-```sh
-git clone https://github.com/tripaulx/scripts.git
-cd scripts
+```
+.
+├── bin/                    # Scripts executáveis
+│   ├── caprover/          # Comandos do CapRover
+│   │   ├── setup          # Instalação do CapRover
+│   │   └── validate       # Validação da instalação
+│   └── security/          # Comandos de segurança
+│       ├── setup          # Configuração inicial
+│       ├── harden         # Hardening do sistema
+│       └── diagnose       # Diagnóstico de segurança
+├── core/                  # Bibliotecas principais
+├── docs/                  # Documentação detalhada
+├── modules/               # Módulos de funcionalidades
+├── tests/                 # Testes automatizados
+├── main.sh                # Interface principal
+├── setup -> bin/setup     # Configuração inicial
+├── harden -> bin/security/harden  # Hardening de segurança
+├── diagnose -> bin/security/diagnose  # Diagnóstico
+├── caprover-setup -> bin/caprover/setup  # Instalação do CapRover
+└── caprover-validate -> bin/caprover/validate  # Validação
 ```
 
-2. Permissão de execução (importante!)
+## 🚀 Começando Rápido
 
-Se ao rodar um script aparecer `Permission denied`, torne-o executável:
-
-```sh
-chmod +x *.sh
+### 1. Clone o repositório
+```bash
+git clone https://github.com/seu-usuario/seu-repositorio.git
+cd seu-repositorio
 ```
 
-3. **Preparação Inicial do Servidor**  
+### 2. Dê permissão de execução
+```bash
+chmod +x main.sh setup harden diagnose caprover-*
+```
+
+### 3. Execute o menu principal
+```bash
+sudo ./main.sh
+```
+
+### 4. Ou use comandos diretos
+- Configuração inicial: `sudo ./setup`
+- Hardening de segurança: `sudo ./harden`
+- Diagnóstico: `sudo ./diagnose`
+- Instalar CapRover: `sudo ./caprover-setup`
+- Validar instalação: `sudo ./caprover-validate`
+
+## 📋 Requisitos do Sistema
+
+- **Sistema Operacional**: Debian 12 (Bookworm)
+- **Acesso**: root ou usuário com sudo
+- **Conexão**: Internet estável
+- **Mínimo**: 1GB RAM, 1 CPU, 10GB disco
+- **Recomendado**: 4GB+ RAM, 2+ CPUs, 20GB+ disco
+
+## 🛠️ Recursos Principais
+
+### 🔒 Segurança
+- Hardening de sistema
+- Configuração segura de SSH
+- Firewall UFW
+- Proteção Fail2Ban
+- Auditoria de segurança
+
+### 🐋 CapRover
+- Instalação automatizada
+- Validação de ambiente
+- Gerenciamento de apps
+- Backup e restauração
+
+### ⚙️ Sistema
+- Atualizações automáticas
+- Monitoramento
+- Logs centralizados
+- Backup de configurações
+
+## 📚 Documentação Completa
+
+Consulte a pasta `docs/` para documentação detalhada:
+- [Guia de Início Rápido](docs/ONBOARDING_CHECKLIST.md)
+- [Requisitos do Sistema](docs/REQUIREMENTS.md)
+- [Checklist de Segurança](docs/SECURITY_CHECKLIST.md)
+- [Plano de Desenvolvimento](docs/ROADMAP.md)
+- [Guia de Contribuição](docs/CONTRIBUTING.md)
+
+## 🔄 Atualizações
+
+Para atualizar para a versão mais recente:
+```bash
+git pull origin main
+```
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas! Por favor, leia nosso [Guia de Contribuição](docs/CONTRIBUTING.md) para começar.
+
+## 📄 Licença
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+### Verificação de Dependências
+
+Para verificar automaticamente se todas as dependências necessárias estão instaladas, execute:
+
+```bash
+chmod +x check-dependencies.sh
+./check-dependencies.sh
+```
+
+Consulte o arquivo [REQUIREMENTS.md](docs/REQUIREMENTS.md) para informações detalhadas sobre cada dependência e instruções de instalação específicas para diferentes distribuições.
+
+## 🏗️ Estrutura do Projeto
+
+O projeto foi organizado em uma estrutura modular para melhor manutenção e extensibilidade:
+
+```
+scripts/
+├── core/                  # Funções e utilitários compartilhados
+│   ├── utils.sh           # Funções utilitárias gerais
+│   ├── validations.sh     # Funções de validação
+│   ├── backup.sh          # Funções de backup e restauração
+│   └── security.sh        # Funções de segurança compartilhadas
+├── modules/              # Módulos de funcionalidades específicas
+│   ├── ssh/              # Configuração segura do SSH
+│   │   ├── ssh.sh        # Funções principais do módulo SSH
+│   │   └── validations.sh # Validações específicas do SSH
+│   ├── ufw/              # Configuração do firewall UFW
+│   │   ├── ufw.sh        # Funções principais do módulo UFW
+│   │   └── validations.sh # Validações específicas do UFW
+│   └── fail2ban/         # Configuração do Fail2Ban
+│       ├── fail2ban.sh   # Funções principais do módulo Fail2Ban
+│       └── validations.sh # Validações específicas do Fail2Ban
+├── main.sh               # Script principal (interface interativa)
+└── scripts/              # Scripts de uso específico
+    ├── initial-setup.sh  # Configuração inicial do servidor
+    ├── setup-caprover.sh # Instalação e configuração do CapRover
+    ├── validate-postreboot.sh # Validação pós-reinicialização
+    ├── zero-initial.sh   # Diagnóstico de segurança
+    └── zerup-scurity-setup.sh # Assistente de hardening de segurança
+```
+
+## 🛠 Instalação no Debian 12
+
+1. **Atualize o sistema**
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
+
+2. **Clone o repositório**
+   ```bash
+   git clone https://github.com/seu-usuario/automacao-caprover.git
+   cd automacao-caprover
+   ```
+
+3. **Dê permissão de execução aos scripts**
+   ```bash
+   chmod +x *.sh
+   ```
+
+4. **Execute o script de verificação de dependências**
+   ```bash
+   sudo ./check-dependencies.sh
+   ```
+   
+   > 💡 Este script irá instalar automaticamente todas as dependências necessárias no Debian 12.
+
+3. **Executando o Script Principal**
+   
+   O script principal oferece uma interface interativa para gerenciar todas as funcionalidades:
+   
+   ```bash
+   # Executar o script principal
+   sudo ./main.sh
+   ```
+   
+   O menu principal oferece as seguintes opções:
+   - 🔒 Executar Hardening Completo
+   - ⚙️  Configurar Módulos Individuais
+   - 📊 Gerar Relatório de Segurança
+   - 🔄 Reverter Alterações (Rollback)
+   - 🛠️  Ferramentas Avançadas
+   - 🚪 Sair
+
+4. **Preparação Inicial do Servidor**  
    Execute o script de preparação para garantir um sistema atualizado e pronto:
    ```bash
-   sudo ./initial-setup.sh
+   sudo ./scripts/initial-setup.sh
    ```
    > Dica: Este script pode incluir atualizações, timezone, swap, SSH seguro, etc.
 
-4. **Validação pós-reboot**  
+5. **Validação pós-reboot**  
    Após reiniciar o servidor, valide se o ambiente está saudável:
    ```bash
-   sudo ./validate-postreboot.sh
+   sudo ./scripts/validate-postreboot.sh
    ```
    > Esse script checa serviços essenciais, swap, espaço em disco, conectividade e recomenda snapshot/backup antes de rodar scripts destrutivos.
 
-5. **Hardening de Segurança**  
+6. **Hardening de Segurança**  
    Execute o assistente interativo de hardening:
    ```bash
-   sudo ./zerup-scurity-setup.sh
+   sudo ./scripts/zerup-scurity-setup.sh
    ```
    > Configurações de segurança interativas, incluindo SSH, UFW, Fail2Ban e mais.
 
-6. **Diagnóstico de Segurança (Opcional)**  
+7. **Diagnóstico de Segurança (Opcional)**  
    Para verificar o estado de segurança sem fazer alterações:
    ```bash
-   sudo ./zero-initial.sh
+   sudo ./scripts/zero-initial.sh
    ```
    > Apenas diagnóstico (não faz alterações) de portas abertas, configurações do SSH, UFW, etc.
 
-6. **Setup Automatizado do CapRover**  
+8. **Setup Automatizado do CapRover**  
    Use o script principal para instalar, limpar ambiente Docker e configurar CapRover totalmente automatizado:
    ```bash
    export CAPROVER_ADMIN_PASS=suasenha
    export CAPROVER_ROOT_DOMAIN=seudominio.com
    export CAPROVER_ADMIN_EMAIL=seu@email.com
-   sudo ./setup-caprover.sh --force
+   sudo ./scripts/setup-caprover.sh --force
    ```
    - **--force**: Executa sem confirmações interativas (ideal para automação/CI).
    - As variáveis de ambiente permitem configurar domínio, senha e e-mail do admin automaticamente no wizard inicial via CLI.
 
-## Scripts Principais
+## Módulos Principais
 
-### zerup-scurity-setup.sh
+### main.sh
+
+O script principal que oferece uma interface interativa para gerenciar todas as funcionalidades de segurança e configuração do servidor.
+
+**Funcionalidades principais:**
+- Interface de menu interativa
+- Execução de hardening completo ou por módulos individuais
+- Geração de relatórios de segurança
+- Ferramentas avançadas para diagnóstico e solução de problemas
+- Sistema de rollback para reverter alterações
+
+**Uso básico:**
+```bash
+# Modo interativo
+sudo ./main.sh
+
+# Ajuda
+sudo ./main.sh --help
+```
+
+### Scripts de Uso Específico
+
+#### zerup-scurity-setup.sh
 Script interativo de hardening de segurança completo que implementa as melhores práticas para servidores Linux em produção, com confirmação em cada etapa.
 
 **Funcionalidades principais:**
@@ -132,7 +325,7 @@ sudo ./zerup-scurity-setup.sh --port=2222 --user=admin --non-interactive
 
 ---
 
-### setup-caprover.sh
+#### setup-caprover.sh
 - Diagnóstico do sistema e Docker
 - Backup e validação do volume `/captain`
 - Limpeza agressiva de containers, volumes, redes e serviços Docker antigos
@@ -142,39 +335,284 @@ sudo ./zerup-scurity-setup.sh --port=2222 --user=admin --non-interactive
 - Automatiza o wizard inicial do CapRover via CLI (`caprover serversetup`)
 - Diagnóstico pós-instalação, logs e troubleshooting automático
 
+## Módulos de Segurança
+
+### Módulo SSH
+Configuração segura do servidor SSH, incluindo:
+- Troca da porta padrão
+- Desativação do login root
+- Limitação de tentativas de login
+- Autenticação por chaves
+
+### Módulo UFW (Firewall)
+Configuração do firewall não-complicado:
+- Regras restritivas padrão
+- Abertura apenas de portas necessárias
+- Proteção contra varredura de portas
+- Logging de tentativas de acesso
+
+### Módulo Fail2Ban
+Proteção contra força bruta:
+- Detecção de tentativas de login
+- Banimento automático de IPs maliciosos
+- Proteção para serviços como SSH, Nginx, Apache
+- Notificações por e-mail (opcional)
+
 ## Pré-requisitos
 - Debian 12+ (bookworm) ou compatível
 - Permissão root (sudo)
 - Acesso à internet
 
 ## Variáveis de Ambiente Importantes
+
+### Configuração do CapRover
 | Variável                 | Descrição                                    |
 |-------------------------|-----------------------------------------------|
 | CAPROVER_ADMIN_PASS     | Senha do admin CapRover (obrigatório)         |
 | CAPROVER_ROOT_DOMAIN    | Domínio root do painel CapRover               |
 | CAPROVER_ADMIN_EMAIL    | E-mail do admin CapRover                      |
 
+### Configurações de Segurança
+| Variável                 | Descrição                                    |
+|-------------------------|-----------------------------------------------|
+| SSH_PORT               | Porta SSH personalizada (padrão: 22)          |
+| UFW_ENABLE_LOGGING     | Habilitar logging do UFW (padrão: yes)        |
+| FAIL2BAN_EMAIL        | E-mail para notificações do Fail2Ban          |
+
 > Se não definir, valores padrão seguros serão usados, mas recomenda-se sempre definir as suas variáveis.
 
 ## Troubleshooting
-- O script faz diagnóstico automático se detectar falha na inicialização do CapRover (ex: tela 'firewall-passed').
-- Logs detalhados são salvos em `install.log` e rotacionados.
-- Checagem e correção automática de permissões do volume `/captain`.
-- Mensagens claras orientam o usuário em caso de erro.
 
-## Dicas para Automação/Infraestrutura como Código
-- Integre estes scripts em pipelines CI/CD, Terraform, Ansible, etc.
-- Use o modo `--force` e variáveis de ambiente para automação 100% sem interação manual.
-- Scripts idempotentes: podem ser executados múltiplas vezes sem causar problemas.
+### Problemas Comuns
+
+#### Falha na Inicialização do CapRover
+- Verifique os logs em tempo real: `docker service logs captain-captain --tail 100 --follow`
+- Verifique se todas as portas necessárias estão abertas: `sudo netstat -tuln`
+- Confirme se o domínio está apontando para o IP correto
+
+#### Problemas de Conexão SSH
+- Verifique se o serviço SSH está rodando: `sudo systemctl status ssh`
+- Confirme se a porta SSH está aberta no firewall: `sudo ufw status`
+- Verifique se o IP não está bloqueado pelo Fail2Ban: `sudo fail2ban-client status`
+
+#### Logs Importantes
+- Logs do sistema: `/var/log/syslog`
+- Logs de autenticação: `/var/log/auth.log`
+- Logs do Docker: `journalctl -u docker.service`
+- Logs do CapRover: `docker service logs captain-captain`
+- Logs do UFW: `journalctl -u ufw`
+- Logs do Fail2Ban: `journalctl -u fail2ban`
+
+### Ferramentas de Diagnóstico
+
+O script principal inclui ferramentas avançadas para diagnóstico:
+
+1. **Verificar Portas Abertas**
+   - Lista todas as portas em uso e por quais processos
+
+2. **Verificar Logs do Sistema**
+   - Acesso rápido aos logs de sistema, autenticação e serviços
+
+3. **Testar Configuração de Segurança**
+   - Verifica a configuração de todos os módulos de segurança
+   - Gera relatório detalhado de possíveis problemas
+
+4. **Atualizar Scripts**
+   - Verifica e aplica atualizações dos scripts
+
+### Mensagens de Erro Comuns
+
+1. **"Porta já em uso"**
+   - Solução: Use `lsof -i :PORTA` para identificar o processo e encerrá-lo ou escolha outra porta.
+
+2. **"Permissão negada"**
+   - Solução: Execute o script com `sudo` ou como usuário root.
+
+3. **Falha no Fail2Ban**
+   - Verifique se há erros de configuração: `sudo fail2ban-client -x -f start`
+   - Confirme se os arquivos de log estão acessíveis
+
+4. **Problemas com UFW**
+   - Verifique se o UFW está ativo: `sudo ufw status`
+   - Se necessário, desative e reative: `sudo ufw disable && sudo ufw enable`
+
+### Logs Detalhados
+- Logs do script principal: `/var/log/security_hardening_*.log`
+- Logs de instalação do CapRover: `install.log`
+- Backups de configurações: `/var/backups/security/`
+
+### Recuperação de Desastres
+
+#### Rollback de Configurações
+O sistema mantém backups automáticos das configurações alteradas. Para reverter:
+
+1. Acesse o menu principal: `sudo ./main.sh`
+2. Selecione a opção "Reverter Alterações (Rollback)"
+3. Escolha o backup desejado
+
+#### Recuperação de Acesso SSH
+Se você perdeu o acesso SSH:
+
+1. Acesse o servidor via console (KVM, VNC, IPMI, etc.)
+2. Faça login como root
+3. Verifique o status do serviço SSH: `systemctl status ssh`
+4. Verifique as regras de firewall: `ufw status`
+5. Verifique se o Fail2Ban não está bloqueando seu IP: `fail2ban-client status`
+6. Se necessário, restaure o acesso temporariamente:
+   ```bash
+   ufw allow 22/tcp
+   fail2ban-client set sshd unbanip SEU_IP
+   systemctl restart ssh
+   ```
+
+#### Restauração do CapRover
+Se o painel do CapRover não estiver acessível:
+
+1. Verifique os logs do serviço: `docker service logs captain-captain`
+2. Verifique se os containers estão rodando: `docker ps -a`
+3. Se necessário, reinicie o serviço:
+   ```bash
+   docker service scale captain-captain=0
+   docker service scale captain-captain=1
+   ```
+4. Verifique o status do cluster Docker: `docker node ls`
+
+### Suporte Adicional
+
+Para suporte adicional, consulte:
+- [Documentação do CapRover](https://caprover.com/docs/)
+- [Documentação do UFW](https://help.ubuntu.com/community/UFW)
+- [Documentação do Fail2Ban](https://www.fail2ban.org/wiki/index.php/Main_Page)
+
+Se o problema persistir, colete as seguintes informações antes de entrar em contato com o suporte:
+1. Saída de `uname -a`
+2. Versão do Docker: `docker --version`
+3. Logs relevantes (conforme listado acima)
+4. Comportamento esperado vs. comportamento observado
+
+## Automação e Infraestrutura como Código
+
+### Integração com Ferramentas de Automação
+
+#### Ansible
+```yaml
+- name: Executar hardening de segurança
+  hosts: all
+  become: yes
+  tasks:
+    - name: Copiar scripts para o servidor
+      copy:
+        src: scripts/
+        dest: /opt/security-scripts
+        mode: '0755'
+    
+    - name: Executar hardening
+      command: /opt/security-scripts/main.sh --non-interactive
+      environment:
+        SSH_PORT: "{{ ssh_port }}"
+        UFW_ENABLE_LOGGING: "yes"
+```
+
+#### Terraform
+```hcl
+resource "null_resource" "server_hardening" {
+  provisioner "remote-exec" {
+    inline = [
+      "git clone https://github.com/seu-usuario/automacao-caprover.git /tmp/security-scripts",
+      "chmod +x /tmp/security-scripts/*.sh",
+      "sudo /tmp/security-scripts/main.sh --non-interactive"
+    ]
+    
+    connection {
+      type        = "ssh"
+      user        = "root"
+      private_key = file("~/.ssh/id_rsa")
+      host        = aws_instance.server.public_ip
+    }
+  }
+}
+```
+
+### Variáveis de Ambiente para Automação
+
+Para execução não-interativa, você pode definir as seguintes variáveis de ambiente:
+
+```bash
+# Configurações básicas
+SSH_PORT=2222
+UFW_ENABLE_LOGGING=yes
+FAIL2BAN_EMAIL=admin@example.com
+
+# Configurações do CapRover
+export CAPROVER_ADMIN_PASS=seupassword
+export CAPROVER_ROOT_DOMAIN=meudominio.com
+export CAPROVER_ADMIN_EMAIL=admin@meudominio.com
+
+# Executar em modo não-interativo
+./main.sh --non-interactive
+```
+
+### Boas Práticas para Automação
+
+1. **Idempotência**: Todos os scripts podem ser executados múltiplas vezes sem efeitos colaterais indesejados.
+
+2. **Logs Detalhados**: Logs são salvos em `/var/log/security_hardening_*.log` para auditoria.
+
+3. **Backup Automático**: Configurações originais são salvas em `/var/backups/security/`.
+
+4. **Saídas de Status**: Os scripts retornam códigos de saída apropriados para integração com ferramentas de CI/CD.
 
 ## Referências
-- [CapRover Documentação Oficial](https://caprover.com/docs/)
+
+### Documentação Oficial
+- [CapRover Documentation](https://caprover.com/docs/)
+- [UFW Documentation](https://help.ubuntu.com/community/UFW)
+- [Fail2Ban Documentation](https://www.fail2ban.org/wiki/index.php/Main_Page)
+- [OpenSSH Documentation](https://www.openssh.com/manual.html)
+
+### Troubleshooting
 - [CapRover Troubleshooting](https://caprover.com/docs/troubleshooting.html)
-- Scripts auxiliares: `validate-postreboot.sh` (diagnóstico pós-reboot), `zero-initial.sh` (hardening e diagnóstico de segurança)
+- [UFW Common Issues](https://help.ubuntu.com/community/UFW#Common_Issues)
+- [Fail2Ban Troubleshooting](https://www.fail2ban.org/wiki/index.php/FAQ)
+
+### Scripts Auxiliares
+- `validate-postreboot.sh`: Diagnóstico pós-reinicialização
+- `zero-initial.sh`: Diagnóstico de segurança
+- `zerup-scurity-setup.sh`: Assistente de hardening
+- `setup-caprover.sh`: Instalação automatizada do CapRover
+
+## 📜 Histórico de Alterações
+
+Para um registro detalhado de todas as alterações significativas feitas no projeto, consulte o [CHANGELOG.md](docs/CHANGELOG.md).
+
+## Contribuição
+
+### Padrões de Código
+- Siga o [Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html)
+- Use `shellcheck` para verificar erros comuns
+- Documente todas as funções com comentários claros
+
+### Processo de Contribuição
+1. Crie um fork do repositório
+2. Crie uma branch para sua feature: `git checkout -b feature/nova-funcionalidade`
+3. Faça commit das suas alterações: `git commit -m 'Adiciona nova funcionalidade'`
+4. Push para a branch: `git push origin feature/nova-funcionalidade`
+5. Abra um Pull Request
+
+### Testes
+Antes de enviar um PR, certifique-se de:
+1. Executar todos os testes: `./run-tests.sh`
+2. Verificar se o shellcheck não encontra erros: `shellcheck **/*.sh`
+3. Atualizar a documentação conforme necessário
+
+## Licença
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## Agradecimentos
+- Equipe do CapRover por uma ferramenta incrível
+- Comunidade de código aberto por contribuições valiosas
+- Todos os mantenedores e contribuidores ativos
 
 ---
 
-Se precisar de exemplos avançados, integração com DNS, SSL, backups ou monitoramento, consulte as recomendações no topo do script principal ou peça suporte!
-
-## Para Contribuidores
-Consulte sempre o arquivo [AGENTS.md](./AGENTS.md) para seguir o padrão obrigatório de documentação, estrutura e mensagens em todos os scripts deste projeto.
+Para suporte adicional, integração personalizada ou consultoria em segurança, entre em contato com nossa equipe.

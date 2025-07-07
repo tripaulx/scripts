@@ -18,6 +18,7 @@ Icon?
 *.log
 *.out
 *.err
+/test-results-*.log
 
 # Backup do shell
 *.sh~
@@ -31,6 +32,12 @@ Icon?
 # Arquivos de sistema
 Thumbs.db
 Desktop.ini
+
+# Arquivos de teste
+/test/
+/coverage/
+.pytest_cache/
+.mypy_cache/
 
 # Ignorar arquivos sensíveis (ajuste conforme necessidade)
 *.pem
