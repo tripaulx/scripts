@@ -125,17 +125,18 @@ install_caprover() {
         fi
     fi
 
-    # Instalar CapRover
+    # Instalar CapRover executando o script completo
     show_message "info" "Iniciando instalação do CapRover..."
-    caprover serversetup
-    
-    if [ $? -eq 0 ]; then
+    "${SCRIPT_DIR}/caprover-setup/setup-caprover.sh"
+    local caprover_status=$?
+
+    if [ ${caprover_status} -eq 0 ]; then
         show_message "success" "CapRover instalado com sucesso!"
         echo -e "${COLOR_GREEN}Acesse o painel em: https://captain.seudominio.com${COLOR_RESET}"
         echo -e "${COLOR_YELLOW}Senha padrão:${COLOR_RESET} captain42"
     else
-        show_message "error" "Ocorreu um erro durante a instalação do CapRover."
-        return 1
+        show_message "error" "Ocorreu um erro durante a instalação do CapRover. Consulte os logs."
+        return ${caprover_status}
     fi
     
     read -rp "Pressione Enter para continuar..."
