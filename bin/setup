@@ -37,6 +37,113 @@
 #   - AGENTS.md (padrão de scripts)
 ########################################################################
 
-set -e  # Encerra ao primeiro erro
+set -euo pipefail
 
+log() {
+    echo "[\$(date '+%Y-%m-%d %H:%M:%S')] $1"
+}
 
+check_root() {
+    if [ "$EUID" -ne 0 ]; then
+        echo "Este script precisa ser executado como root." >&2
+        exit 1
+    fi
+}
+
+update_system() {
+    log "Atualizando sistema..."
+    apt-get update -y && apt-get upgrade -y
+}
+
+configure_locale_timezone() {
+    local TZ_REGION="America/Sao_Paulo"
+    log "Configurando timezone para ${TZ_REGION}..."
+    timedatectl set-timezone "$TZ_REGION"
+
+    log "Configurando locale pt_BR.UTF-8..."
+    sed -i 's/^# *pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/' /etc/locale.gen
+    locale-gen
+    update-locale LANG=pt_BR.UTF-8
+}
+
+install_packages() {
+    log "Instalando pacotes essenciais..."
+    apt-get install -y curl ca-certificates gnupg lsb-release \
+        software-properties-common ufw fail2ban build-essential
+}
+
+setup_swap() {
+    local SWAPFILE="/swapfile"
+    if [ ! -f "$SWAPFILE" ]; then
+        log "Criando swap de 1G em ${SWAPFILE}..."
+        fallocate -l 1G "$SWAPFILE" || dd if=/dev/zero of="$SWAPFILE" bs=1M count=1024
+        chmod 600 "$SWAPFILE"
+        mkswap "$SWAPFILE"
+        swapon "$SWAPFILE"
+        echo "$SWAPFILE none swap sw 0 0" >> /etc/fstab
+    else
+        log "Swap já configurada."
+    fi
+}
+
+install_docker() {
+    if ! command -v docker >/dev/null 2>&1; then
+        log "Instalando Docker..."
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/debian/gpg | \
+            gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+https://download.docker.com/linux/debian $(lsb_release -cs) stable" > \
+            /etc/apt/sources.list.d/docker.list
+        apt-get update -y
+        apt-get install -y docker-ce docker-ce-cli containerd.io
+    else
+        log "Docker já instalado."
+    fi
+}
+
+install_node_caprover() {
+    if ! command -v node >/dev/null 2>&1; then
+        log "Instalando Node.js..."
+        curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+        apt-get install -y nodejs
+    fi
+
+    if ! npm list -g caprover >/dev/null 2>&1; then
+        log "Instalando CapRover CLI..."
+        npm install -g caprover
+    fi
+}
+
+enable_security() {
+    log "Configurando UFW e Fail2Ban..."
+    ufw allow OpenSSH
+    ufw --force enable
+    systemctl enable --now ufw
+    systemctl enable --now fail2ban
+}
+
+summary() {
+    log "Resumo da instalação:"
+    echo "Sistema: $(lsb_release -ds 2>/dev/null || cat /etc/os-release | grep PRETTY_NAME)"
+    echo "Docker : $(docker --version 2>/dev/null || echo 'não instalado')"
+    echo "Node   : $(node -v 2>/dev/null || echo 'não instalado')"
+    echo "CapRover CLI: $(caprover -v 2>/dev/null || echo 'não instalado')"
+    free -h
+    df -h /
+}
+
+main() {
+    check_root
+    update_system
+    configure_locale_timezone
+    install_packages
+    setup_swap
+    install_docker
+    install_node_caprover
+    enable_security
+    summary
+    log "Setup concluído."
+}
+
+main "$@"
