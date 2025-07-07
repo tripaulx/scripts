@@ -50,6 +50,7 @@ declare -A DEPENDENCIES=(
     ["monitor"]="htop iotop iftop nethogs"
     ["network"]="net-tools iproute2 dnsutils"
     ["security"]="unattended-upgrades apt-listchanges"
+    ["caprover"]="docker.io nodejs npm"
 )
 
 #
@@ -147,6 +148,34 @@ install_package() {
 }
 
 #
+# check_npm_package
+#
+# Descrição:
+#   Verifica se um pacote npm global está instalado.
+#
+check_npm_package() {
+    local pkg="$1"
+    npm list -g --depth=0 "$pkg" >/dev/null 2>&1
+}
+
+#
+# install_npm_package
+#
+# Descrição:
+#   Instala um pacote npm globalmente.
+#
+install_npm_package() {
+    local pkg="$1"
+    log "info" "Instalando pacote npm: $pkg"
+    if npm install -g "$pkg" >/dev/null 2>&1; then
+        log "success" "Pacote npm instalado: $pkg"
+        return 0
+    fi
+    log "error" "Falha ao instalar pacote npm: $pkg"
+    return 1
+}
+
+#
 # update_package_list
 #
 # Descrição:
@@ -206,6 +235,26 @@ check_dependencies() {
             fi
         done
     done
+
+    # Verificar CapRover CLI
+    log "info" "Verificando dependência adicional: caprover CLI"
+    if check_npm_package caprover && command -v caprover >/dev/null 2>&1; then
+        INSTALLED_DEPS+=("caprover-cli")
+        log "info" "  [✓] caprover-cli (já instalado)"
+    else
+        MISSING_DEPS+=("caprover-cli")
+        ((missing_count++))
+        log "warning" "  [ ] caprover-cli (não instalado)"
+        if [ "$INSTALL_MODE" = true ]; then
+            if install_npm_package caprover; then
+                INSTALLED_DEPS+=("caprover-cli")
+                MISSING_DEPS=("${MISSING_DEPS[@]/caprover-cli}")
+                ((missing_count--))
+            else
+                FAILED_DEPS+=("caprover-cli")
+            fi
+        fi
+    fi
     
     # Resumo
     log "info" "\n=== Resumo da Verificação de Dependências ==="

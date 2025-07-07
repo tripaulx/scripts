@@ -63,6 +63,9 @@
 
 set -e
 
+SCRIPT_ROOT="$(cd "$(dirname "$0")"/../../.. && pwd)"
+"${SCRIPT_ROOT}/src/security/core/check_dependencies.sh" --install
+
 LOGFILE="install.log"
 # Rotaciona log antigo
 if [ -f "$LOGFILE" ]; then
