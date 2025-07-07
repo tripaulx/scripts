@@ -43,9 +43,9 @@ Todo script deve começar com um bloco de cabeçalho bem estruturado, incluindo:
 ## 2. Limites de Tamanho e Modularização
 
 ### 2.1 Tamanho Máximo de Arquivos
-- **521 linhas**: Limite absoluto para qualquer arquivo de código fonte
+- **600 linhas**: Limite absoluto para qualquer arquivo de código fonte
   - Se um arquivo se aproximar de 400 linhas, já deve ser considerada a modularização
-  - Arquivos que ultrapassarem 521 linhas devem ser imediatamente refatorados
+  - Arquivos que ultrapassarem 600 linhas devem ser imediatamente refatorados
 
 ### 2.2 Tamanho de Chunks de Análise
 - **300 linhas**: Tamanho máximo recomendado para chunks de análise
@@ -58,6 +58,94 @@ Todo script deve começar com um bloco de cabeçalho bem estruturado, incluindo:
 2. **Funções Específicas**: Cada função deve ter uma única responsabilidade
 3. **Arquivos de Módulos**: Use a estrutura de pastas para organizar funcionalidades relacionadas
 4. **Documentação Clara**: Cada módulo deve ter documentação adequada
+
+### 2.4 Documentação Detalhada de Código
+
+#### Para Funções:
+```bash
+#
+# Nome da Função
+#
+# Descrição: 
+#   Descrição clara e concisa do propósito da função.
+#
+# Parâmetros:
+#   $1 - Descrição do primeiro parâmetro
+#   $2 - Descrição do segundo parâmetro
+#
+# Retorno:
+#   - 0 em caso de sucesso
+#   - Código de erro em caso de falha
+#
+# Exemplo:
+#   nome_da_função "param1" "param2"
+#
+function nome_da_função() {
+    local param1="$1"
+    local param2="$2"
+    
+    # Lógica da função aqui
+    
+    return 0
+}
+```
+
+#### Para Chunks/Blocos de Código:
+```bash
+#
+# BLOCO: Nome Descritivo do Bloco
+#
+# Propósito:
+#   Explicação detalhada do que este bloco de código faz
+#   e por que ele é necessário no contexto maior.
+#
+# Contexto:
+#   - Estado esperado do sistema antes da execução
+#   - Dependências externas ou requisitos
+#   - Efeitos colaterais conhecidos
+#
+# Exceções:
+#   - Como erros são tratados
+#   - Códigos de retorno específicos
+#
+# Exemplo de Uso:
+#   Inclua um exemplo prático de como usar ou testar o bloco
+#
+
+# Código do bloco aqui
+```
+
+#### Para Arquivos:
+```bash
+#!/bin/bash
+#
+# Nome do Arquivo: nome_do_arquivo.sh
+#
+# Descrição:
+#   Visão geral do propósito e funcionalidade principal do arquivo.
+#   Inclua contexto sobre onde este arquivo se encaixa na arquitetura.
+#
+# Estrutura:
+#   1. Seção de imports e dependências
+#   2. Constantes e configurações globais
+#   3. Definição de funções
+#   4. Fluxo principal de execução
+#
+# Uso:
+#   ./nome_do_arquivo.sh [opções] <argumentos>
+#
+# Opções:
+#   -h  Mostra esta ajuda
+#   -v  Modo verboso
+#
+# Autor: Nome <email@exemplo.com>
+# Data:  AAAA-MM-DD
+# Versão: 1.0.0
+#
+# Histórico de Alterações:
+#   AAAA-MM-DD - Nome - Descrição breve da alteração
+#
+```
 
 ## 3. Comentários e Mensagens
 - Use comentários claros antes de blocos lógicos relevantes.

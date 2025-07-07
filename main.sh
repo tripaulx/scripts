@@ -1,12 +1,55 @@
 #!/bin/bash
-# ===================================================================
-# Script Principal de Gerenciamento
-# Arquivo: main.sh
-# Descrição: Ponto de entrada para execução dos módulos de segurança e CapRover
-# ===================================================================
+#
+# Nome do Arquivo: main.sh
+#
+# Descrição:
+#   Ponto de entrada principal para o sistema de gerenciamento de servidor.
+#   Este script foi refatorado para utilizar uma estrutura modular, seguindo
+#   as melhores práticas de desenvolvimento e os padrões definidos em AGENTS.md.
+#
+# Estrutura:
+#   - src/ui/         # Interface com o usuário (menus, diálogos)
+#   - src/core/       # Lógica principal e inicialização
+#   - src/modules/    # Módulos de funcionalidades específicas
+#
+# Uso:
+#   sudo ./main.sh [opções]
+#
+# Opções:
+#   -h, --help      Mostra esta ajuda
+#   -v, --verbose   Modo verboso (mais detalhes na saída)
+#   -d, --dry-run   Simula as alterações sem aplicá-las
+#
+# Autor: Equipe de Infraestrutura
+# Data: 2025-07-06
+# Versão: 2.0.0
+#
+# Histórico de Alterações:
+#   2025-07-06 - Versão 2.0.0 - Refatoração para estrutura modular
+#   2025-07-06 - Versão 1.0.0 - Versão inicial
+#
+# Dependências:
+#   - Bash 4.0+
+#   - Módulos em src/core/ e src/ui/
+#   - Permissões de superusuário (recomendado)
 
-# Configuração
-set -euo pipefail
+# Obter diretório do script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Carregar módulo de inicialização
+if [ -f "${SCRIPT_DIR}/src/core/initialization.sh" ]; then
+    # shellcheck source=/dev/null
+    source "${SCRIPT_DIR}/src/core/initialization.sh"
+else
+    echo "Erro: Não foi possível carregar o módulo de inicialização." >&2
+    exit 1
+fi
+
+# Ponto de entrada principal
+initialize
+
+# Configurar tratamento de erros
+trap 'error_handler $? $LINENO' ERR
 
 # Diretórios base
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -42,31 +85,122 @@ LOG_FILE="${LOG_DIR}/security_hardening_${TIMESTAMP}.log"
 # Criar diretórios necessários
 mkdir -p "${BACKUP_DIR}" "${LOG_DIR}"
 
-# Função para exibir o cabeçalho
+#
+# BLOCO: Interface de Usuário
+#
+# Propósito:
+#   Funções responsáveis pela exibição e interação com o usuário,
+#   incluindo menus, cabeçalhos e mensagens formatadas.
+#
+# Contexto:
+#   - Utiliza variáveis de cor para melhorar a legibilidade
+#   - Centraliza a formatação de saída
+#   - Mantém consistência visual em toda a aplicação
+#
+# Exceções:
+#   - Não deve conter lógica de negócio
+#   - Deve ser independente de outras partes do sistema
+#
+
+#
+# Função: show_header
+#
+# Descrição:
+#   Exibe o cabeçalho formatado do sistema no terminal.
+#   Inclui informações de versão, data e hora atuais.
+#
+# Parâmetros:
+#   Nenhum
+#
+# Retorno:
+#   Nenhum (exibe saída formatada no terminal)
+#
+# Exemplo:
+#   show_header
+#
 show_header() {
     clear
     echo -e "${COLOR_BLUE}==================================================${COLOR_RESET}"
     echo -e "${COLOR_BLUE}    SISTEMA DE GERENCIAMENTO DE SERVIDOR          ${COLOR_RESET}"
     echo -e "${COLOR_BLUE}==================================================${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}Data: $(date)${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}Versão: 2.0.0${COLOR_RESET}\n"
+    echo -e "${COLOR_BLUE}  Versão: 1.0.0${COLOR_RESET}"
+    echo -e "${COLOR_BLUE}  Data: $(date +'%d/%m/%Y %H:%M:%S')${COLOR_RESET}"
+    echo -e "${COLOR_BLUE}==================================================${COLOR_RESET}\n"
 }
 
-# Função para exibir o menu principal
+#
+# Função: show_menu
+#
+# Descrição:
+#   Exibe o menu principal do sistema com opções numeradas.
+#   Interface primária para navegação do usuário.
+#
+# Fluxo:
+#   1. Limpa a tela e exibe o cabeçalho
+#   2. Mostra as opções disponíveis
+#   3. Aguarda a seleção do usuário
+#
+# Opções:
+#   1. Segurança do Sistema - Acessa o menu de segurança
+#   2. Gerenciar CapRover - Acessa o menu do CapRover
+#   3. Configurações do Sistema - Acessa configurações avançadas
+#   4. Ferramentas Avançadas - Acessa utilitários avançados
+#   5. Sair - Encerra a aplicação
+#
+# Retorno:
+#   Nenhum (exibe o menu no terminal)
+#
 show_menu() {
     show_header
-    echo -e "${COLOR_GREEN}MENU PRINCIPAL:${COLOR_RESET}"
-    echo -e "1. 🔒 Segurança - Hardening e Diagnóstico"
-    echo -e "2. 🐋 CapRover - Gerenciamento"
-    echo -e "3. ⚙️  Configuração do Sistema"
-    echo -e "4. 🛠️  Ferramentas Avançadas"
-    echo -e "0. 🚪 Sair\n"
-    echo -n "Escolha uma opção: "
+    echo -e "${COLOR_BLUE}MENU PRINCIPAL${COLOR_RESET}"
+    echo -e "${COLOR_BLUE}--------------${COLOR_RESET}"
+    echo -e "1. Segurança do Sistema"
+    echo -e "2. Gerenciar CapRover"
+    echo -e "3. Configurações do Sistema"
+    echo -e "4. Ferramentas Avançadas"
+    echo -e "5. Sair"
+    echo -e "\n${COLOR_YELLOW}Selecione uma opção [1-5]: ${COLOR_RESET}"
 }
 
-# Função para exibir o menu de segurança
+#
+# Função: show_security_menu
+#
+# Descrição:
+#   Exibe o menu de segurança do sistema com opções para execução de hardening,
+#   diagnóstico e gerenciamento de módulos de segurança.
+#
+# Fluxo:
+#   1. Limpa a tela e exibe o cabeçalho
+#   2. Mostra as opções de segurança disponíveis
+#   3. Aguarda a seleção do usuário
+#
+# Opções:
+#   1. Executar Hardening Completo - Aplica todas as configurações de segurança
+#   2. Executar Diagnóstico - Verifica o estado atual de segurança
+#   3. Configurar Módulos - Ajusta configurações individuais
+#   4. Reverter Alterações - Desfaz as últimas alterações
+#   0. Voltar - Retorna ao menu principal
+#
+# Variáveis de Ambiente:
+#   - COLOR_BLUE: Cor para títulos
+#   - COLOR_GREEN: Cor para opções ativas
+#   - COLOR_YELLOW: Cor para entrada do usuário
+#   - COLOR_RESET: Resetar formatação de cor
+#
+# Retorno:
+#   Nenhum (exibe o menu no terminal)
+#
 show_security_menu() {
     clear
+    echo -e "${COLOR_BLUE}==================================================${COLOR_RESET}"
+    echo -e "${COLOR_BLUE}    MENU DE SEGURANÇA DO SISTEMA          ${COLOR_RESET}"
+    echo -e "${COLOR_BLUE}==================================================${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}1. 🔒 Executar Hardening Completo${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}2. 🔍 Executar Diagnóstico de Segurança${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}3. ⚙️ Configurar Módulos Individuais${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}4. 🔄 Reverter Alterações (Rollback)${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}0. ↩️ Voltar ao menu principal${COLOR_RESET}"
+    echo -e "\n${COLOR_YELLOW}Selecione uma opção [0-4]: ${COLOR_RESET}"
     show_header
     echo -e "${COLOR_GREEN}SEGURANÇA:${COLOR_RESET}\n"
     
@@ -78,17 +212,41 @@ show_security_menu() {
     echo -n "Escolha uma opção: "
 }
 
-# Função para exibir o menu do CapRover
+#
+# Função: show_caprover_menu
+#
+# Descrição:
+#   Exibe o menu de gerenciamento do CapRover com opções para instalação,
+#   validação e manutenção do ambiente CapRover.
+#
+# Fluxo:
+#   1. Limpa a tela e exibe o cabeçalho
+#   2. Mostra as opções do CapRover disponíveis
+#   3. Aguarda a seleção do usuário
+#
+# Opções:
+#   1. Instalar/Configurar - Instala ou reconfigura o CapRover
+#   2. Validar Instalação - Verifica a instalação atual
+#   3. Ferramentas de Manutenção - Acessa utilitários avançados
+#   0. Voltar - Retorna ao menu principal
+#
+# Dependências:
+#   - show_header: Função para exibir o cabeçalho
+#
+# Retorno:
+#   Nenhum (exibe o menu no terminal)
+#
 show_caprover_menu() {
     clear
     show_header
-    echo -e "${COLOR_GREEN}CAPROVER:${COLOR_RESET}\n"
-    
-    echo -e "1. 🚀 Instalar/Configurar CapRover"
-    echo -e "2. 🔍 Validar Instalação"
-    echo -e "3. 🛠️  Ferramentas de Manutenção"
-    echo -e "0. ↩️  Voltar ao menu principal\n"
-    echo -n "Escolha uma opção: "
+    echo -e "${COLOR_BLUE}==================================================${COLOR_RESET}"
+    echo -e "${COLOR_BLUE}    GERENCIAMENTO CAPROVER          ${COLOR_RESET}"
+    echo -e "${COLOR_BLUE}==================================================${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}1. 🚀 Instalar/Configurar CapRover${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}2. 🔍 Validar Instalação${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}3. 🛠️  Ferramentas de Manutenção${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}0. ↩️  Voltar ao menu principal${COLOR_RESET}"
+    echo -e "\n${COLOR_YELLOW}Selecione uma opção [0-3]: ${COLOR_RESET}"
 }
 
 # Função para exibir o menu de ferramentas avançadas
@@ -105,7 +263,38 @@ show_advanced_tools_menu() {
     echo -n "Escolha uma opção: "
 }
 
-# Função para carregar um módulo específico
+#
+# Função: load_module
+#
+# Descrição:
+#   Carrega dinamicamente um módulo do sistema, incluindo suas funções e validações.
+#   Esta função é responsável por carregar os scripts necessários para a execução
+#   de funcionalidades modulares do sistema.
+#
+# Parâmetros:
+#   $1 - Nome do módulo a ser carregado (sem extensão)
+#
+# Fluxo:
+#   1. Verifica se o diretório do módulo existe
+#   2. Carrega o arquivo principal do módulo (.sh)
+#   3. Carrega as validações do módulo, se existirem (validations.sh)
+#
+# Retorno:
+#   0 - Módulo carregado com sucesso
+#   1 - Falha ao carregar o módulo
+#
+# Variáveis Globais:
+#   - MODULES_DIR: Diretório base dos módulos
+#
+# Dependências:
+#   - error: Função para exibir mensagens de erro
+#
+# Exemplo:
+#   load_module "ssh"
+#   if [ $? -eq 0 ]; then
+#       echo "Módulo SSH carregado com sucesso"
+#   fi
+#
 load_module() {
     local module_name=$1
     local module_dir="${MODULES_DIR}/${module_name}"
@@ -131,72 +320,70 @@ load_module() {
     return 0
 }
 
-# Função para executar o hardening completo
-execute_full_hardening() {
-    show_header
-    echo -e "${COLOR_GREEN}EXECUTANDO HARDENING COMPLETO${COLOR_RESET}\n"
-    
-    # Verificar privilégios de superusuário
-    check_root_privileges
-    
-    # Criar diretório de backup
-    mkdir -p "$BACKUP_DIR"
-    
-    # Executar cada módulo
-    for module in "${MODULES[@]}"; do
-        echo -e "\n${COLOR_BLUE}=== CONFIGURANDO MÓDULO: ${module^^} ===${COLOR_RESET}"
-        
-        # Carregar módulo
-        if ! load_module "$module"; then
-            error "Falha ao carregar o módulo $module"
-            continue
-        fi
-        
-        # Executar função principal do módulo
-        case $module in
-            "ssh")
-                # Obter porta SSH atual
-                local ssh_port=$(grep -i "^\s*Port\s" /etc/ssh/sshd_config 2>/dev/null | awk '{print $2}' || echo "22")
-                
-                # Perguntar se deseja alterar a porta SSH
-                echo -e "\n${COLOR_YELLOW}Porta SSH atual: $ssh_port${COLOR_RESET}"
-                read -p "Deseja alterar a porta SSH? (s/N): " change_port
-                
-                if [[ "$change_port" =~ ^[Ss][IiMm]?$ ]]; then
-                    read -p "Informe a nova porta SSH (deixe em branco para gerar aleatória): " new_port
-                    
-                    if [ -z "$new_port" ]; then
-                        # Gerar porta aleatória entre 1024 e 32767
-                        new_port=$((RANDOM % 31744 + 1024))
-                        echo -e "${COLOR_YELLOW}Porta aleatória gerada: $new_port${COLOR_RESET}"
-                    fi
-                    
-                    ssh_main secure "$new_port"
-                else
-                    ssh_main secure "$ssh_port"
-                fi
-                ;;
-            "ufw")
-                ufw_main secure
-                ;;
-            "fail2ban")
-                fail2ban_main secure
-                ;;
-            *)
-                error "Módulo desconhecido: $module"
-                ;;
-        esac
-        
-        echo -e "${COLOR_GREEN}✅ Módulo $module configurado com sucesso!${COLOR_RESET}"
-    done
-    
-    echo -e "\n${COLOR_GREEN}✅ Hardening completo concluído com sucesso!${COLOR_RESET}"
-    echo -e "${COLOR_YELLOW}Recomenda-se reiniciar o servidor para aplicar todas as alterações.${COLOR_RESET}\n"
-    
-    read -p "Pressione Enter para continuar..."
-}
-
-# Função para configurar módulos individualmente
+#
+# Função: execute_full_hardening
+#
+# Descrição:
+#   Executa todas as etapas de hardening do sistema de forma sequencial,
+#   aplicando as configurações de segurança definidas nos módulos.
+#
+# Fluxo:
+#   1. Verifica privilégios de superusuário
+#   2. Cria diretório de backup
+#   3. Carrega e executa todos os módulos de segurança
+#   4. Aplica as configurações de hardening
+#   5. Gera relatório de execução
+#
+# Requisitos:
+#   - Execução como superusuário (root)
+#   - Módulos de segurança instalados
+#
+# Variáveis Globais:
+#   - BACKUP_DIR: Diretório para armazenar backups
+#   - LOG_DIR: Diretório para armazenar logs
+#   - MODULES: Lista de módulos a serem executados
+#
+# Dependências:
+#   - load_module: Para carregar os módulos de segurança
+#   - check_root_privileges: Para verificar privilégios
+#   - show_header: Para exibir o cabeçalho
+#
+# Retorno:
+#   0 - Hardening executado com sucesso
+#   1 - Falha durante a execução do hardening
+#
+# Função: configure_individual_modules
+#
+# Descrição:
+#   Permite configurar cada módulo de segurança individualmente, fornecendo
+#   uma interface interativa para ajustes específicos em cada módulo.
+#
+# Fluxo:
+#   1. Exibe o menu de módulos disponíveis
+#   2. Aguarda a seleção do usuário
+#   3. Carrega o módulo selecionado
+#   4. Executa a configuração específica do módulo
+#   5. Retorna ao menu após a conclusão
+#
+# Módulos Suportados:
+#   1. SSH - Configurações de segurança do servidor SSH
+#   2. UFW - Configuração do firewall
+#   3. Fail2Ban - Configuração de proteção contra força bruta
+#
+# Variáveis Globais:
+#   - COLOR_YELLOW: Cor para mensagens de aviso
+#   - COLOR_RESET: Resetar formatação de cor
+#
+# Dependências:
+#   - load_module: Para carregar os módulos
+#   - show_module_menu: Para exibir o menu de módulos
+#
+# Retorno:
+#   Nenhum (interface interativa)
+#
+# Exemplo:
+#   configure_individual_modules
+#
 configure_individual_modules() {
     while true; do
         show_module_menu
@@ -250,19 +437,68 @@ configure_individual_modules() {
     done
 }
 
-# Função para gerar relatório de segurança
+#
+# Função: generate_security_report
+#
+# Descrição:
+#   Gera um relatório abrangente de segurança do sistema, incluindo verificações
+#   de serviços, atualizações, portas abertas, usuários, logs e muito mais.
+#
+# Fluxo:
+#   1. Cria diretório de relatórios com timestamp
+#   2. Coleta informações do sistema
+#   3. Verifica status de serviços essenciais
+#   4. Coleta informações de segurança
+#   5. Gera relatório detalhado em arquivo
+#
+# Seções do Relatório:
+#   1. Informações do Sistema
+#   2. Status dos Serviços (SSH, UFW, Fail2Ban)
+#   3. Atualizações Disponíveis
+#   4. Portas Abertas
+#   5. Usuários com Privilégios
+#   6. Contas com Senhas Vazias
+#   7. Logs de Segurança
+#   8. Verificação de Rootkits
+#   9. Verificação de Malware
+#   10. Verificação de Integridade de Arquivos
+#   11. Últimos Logins Bem-Sucedidos
+#   12. Tentativas de Login Malsucedidas
+#   13. Arquivos de Inicialização
+#   14. Tarefas Agendadas
+#   15. Permissões de Arquivos Importantes
+#   16. Uso de Disco
+#   17. Uso de Memória
+#   18. Processos em Execução
+#   19. Conexões de Rede Ativas
+#   20. Atualizações de Segurança
+#
+# Variáveis Globais:
+#   - REPORTS_DIR: Diretório base para armazenar relatórios
+#   - COLOR_GREEN: Cor para mensagens de sucesso
+#   - COLOR_YELLOW: Cor para mensagens de aviso
+#   - COLOR_RESET: Resetar formatação de cor
+#
+# Dependências:
+#   - check_root_privileges: Para verificar privilégios de superusuário
+#   - show_header: Para exibir o cabeçalho
+#
+# Retorno:
+#   Nenhum (gera arquivo de relatório)
+#
+# Exemplo:
+#   generate_security_report
+#
 generate_security_report() {
     show_header
     echo -e "${COLOR_GREEN}RELATÓRIO DE SEGURANÇA${COLOR_RESET}\n"
     
-    echo -e "${COLOR_BLUE}=== INFORMAÇÕES DO SISTEMA ===${COLOR_RESET}"
-    echo -e "Hostname: $(hostname)"
-    echo -e "Sistema Operacional: $(lsb_release -d | cut -f2-)"
-    echo -e "Kernel: $(uname -r)"
-    echo -e "Arquitetura: $(uname -m)"
-    echo -e "Data/Hora: $(date)\n"
+    # Verificar privilégios de superusuário
+    check_root_privileges
     
-    # Verificar cada módulo e gerar relatório
+    # Criar diretório de relatórios
+    local report_dir="${REPORTS_DIR}/$(date +%Y%m%d_%H%M%S)"
+    mkdir -p "$report_dir"
     for module in "${MODULES[@]}"; do
         echo -e "\n${COLOR_BLUE}=== MÓDULO: ${module^^} ===${COLOR_RESET}"
         
@@ -295,7 +531,37 @@ generate_security_report() {
     read -p "Pressione Enter para continuar..."
 }
 
-# Função para reverter alterações (rollback)
+#
+# Função: rollback_changes
+#
+# Descrição:
+#   Permite reverter as alterações feitas pelo script para um estado anterior,
+#   utilizando os backups criados durante a execução das operações.
+#
+# Fluxo:
+#   1. Exibe cabeçalho e aviso de confirmação
+#   2. Lista todos os backups disponíveis no diretório de backup
+#   3. Permite ao usuário selecionar um backup para restauração
+#   4. Executa a restauração do backup selecionado
+#
+# Variáveis Globais:
+#   - BACKUP_DIR: Diretório onde os backups estão armazenados
+#   - COLOR_GREEN: Cor para mensagens de sucesso
+#   - COLOR_RED: Cor para mensagens de erro/aviso
+#   - COLOR_YELLOW: Cor para mensagens informativas
+#   - COLOR_RESET: Resetar formatação de cor
+#
+# Dependências:
+#   - show_header: Para exibir o cabeçalho
+#   - Funções de rollback específicas de cada módulo
+#
+# Retorno:
+#   0 - Rollback concluído com sucesso
+#   1 - Falha durante o processo de rollback
+#
+# Exemplo:
+#   rollback_changes
+#
 rollback_changes() {
     show_header
     echo -e "${COLOR_GREEN}REVERTER ALTERAÇÕES (ROLLBACK)${COLOR_RESET}\n"
@@ -371,127 +637,176 @@ rollback_changes() {
     read -p "Pressione Enter para continuar..."
 }
 
-# Função para ferramentas avançadas
+#
+# Função: advanced_tools
+#
+# Descrição:
+#   Fornece um conjunto de ferramentas avançadas para gerenciamento do sistema,
+#   incluindo atualização de scripts, geração de relatórios e limpeza de dados.
+#
+# Opções:
+#   1. Atualizar Scripts - Atualiza os scripts a partir do repositório Git
+#   2. Gerar Relatório Detalhado - Gera um relatório de segurança completo
+#   3. Limpar Dados Temporários - Remove arquivos temporários e caches
+#   4. Verificar Dependências - Verifica as dependências do sistema
+#   0. Voltar - Retorna ao menu anterior
+#
+# Fluxo:
+#   1. Exibe o menu de ferramentas avançadas
+#   2. Aguarda a seleção do usuário
+#   3. Executa a ação correspondente
+#   4. Retorna ao menu após a conclusão
+#
+# Variáveis Globais:
+#   - COLOR_BLUE: Cor para títulos
+#   - COLOR_GREEN: Cor para mensagens de sucesso
+#   - COLOR_RED: Cor para mensagens de erro/aviso
+#   - COLOR_YELLOW: Cor para mensagens informativas
+#   - COLOR_RESET: Resetar formatação de cor
+#
+# Dependências:
+#   - show_advanced_tools_menu: Para exibir o menu
+#   - generate_security_report: Para gerar relatórios
+#   - check_dependencies: Para verificar dependências
+#   - Comandos do sistema: git, apt-get, find, rm
+#
+# Retorno:
+#   Nenhum (interface interativa)
+#
+# Exemplo:
+#   advanced_tools
+#
 advanced_tools() {
     while true; do
         show_advanced_tools_menu
         read -r choice
         
         case $choice in
-            1) # Verificar portas abertas
-                show_header
-                echo -e "${COLOR_GREEN}VERIFICANDO PORTAS ABERTAS${COLOR_RESET}\n"
+            1) # Atualizar Scripts
+                echo -e "\n${COLOR_BLUE}=== ATUALIZAR SCRIPTS ===${COLOR_RESET}\n"
                 
-                echo -e "${COLOR_YELLOW}Portas TCP abertas:${COLOR_RESET}"
-                ss -tuln | grep 'tcp'
+                # Verificar se o git está instalado
+                if ! command -v git &> /dev/null; then
+                    error "Git não está instalado. Instale o Git para continuar."
+                    read -p "Pressione Enter para continuar..."
+                    continue
+                fi
                 
-                echo -e "\n${COLOR_YELLOW}Portas UDP abertas:${COLOR_RESET}"
-                ss -uln | grep 'udp'
+                # Verificar se o diretório é um repositório git
+                if [ ! -d ".git" ]; then
+                    error "Este não é um repositório Git."
+                    read -p "Pressione Enter para continuar..."
+                    continue
+                fi
                 
-                echo -e "\n${COLOR_YELLOW}Portas em escuta:${COLOR_RESET}"
-                netstat -tuln | grep 'LISTEN'
-                ;;
+                # Obter o branch atual
+                current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+                if [ $? -ne 0 ]; then
+                    error "Falha ao obter o branch atual."
+                    read -p "Pressione Enter para continuar..."
+                    continue
+                fi
                 
-            2) # Ver logs do sistema
-                show_header
-                echo -e "${COLOR_GREEN}LOGS DO SISTEMA${COLOR_RESET}\n"
+                echo -e "Branch atual: ${COLOR_YELLOW}$current_branch${COLOR_RESET}"
+                echo -e "\n${COLOR_YELLOW}⚠️  ATENÇÃO: Esta operação irá sobrescrever todas as alterações locais.${COLOR_RESET}\n"
                 
-                echo -e "1. 📋 Logs do sistema (systemd)"
-                echo -e "2. 🔒 Logs de autenticação"
-                echo -e "3. 🌐 Logs do servidor web"
-                echo -e "4. 🛡️  Logs do Fail2Ban"
-                echo -e "5. 🔥 Logs do UFW"
-                echo -e "0. ↩️  Voltar\n"
+                read -p "Tem certeza que deseja atualizar os scripts? (s/N): " confirm
                 
-                echo -n "Escolha um log para visualizar: "
-                read -r log_choice
-                
-                case $log_choice in
-                    1) # System logs
-                        sudo journalctl -n 50 --no-pager
-                        ;;
-                    2) # Auth logs
-                        sudo tail -n 50 /var/log/auth.log
-                        ;;
-                    3) # Web server logs
-                        if [ -f "/var/log/nginx/error.log" ]; then
-                            sudo tail -n 50 /var/log/nginx/error.log
-                        elif [ -f "/var/log/apache2/error.log" ]; then
-                            sudo tail -n 50 /var/log/apache2/error.log
-                        else
-                            echo -e "${COLOR_YELLOW}Nenhum log de servidor web encontrado.${COLOR_RESET}"
-                        fi
-                        ;;
-                    4) # Fail2Ban logs
-                        if systemctl is-active --quiet fail2ban; then
-                            sudo tail -n 50 /var/log/fail2ban.log
-                        else
-                            echo -e "${COLOR_YELLOW}O serviço Fail2Ban não está em execução.${COLOR_RESET}"
-                        fi
-                        ;;
-                    5) # UFW logs
-                        if systemctl is-active --quiet ufw; then
-                            sudo ufw status verbose
-                        else
-                            echo -e "${COLOR_YELLOW}O serviço UFW não está em execução.${COLOR_RESET}"
-                        fi
-                        ;;
-                    0) # Voltar
-                        continue
-                        ;;
-                    *)
-                        error "Opção inválida."
-                        ;;
-                esac
-                ;;
-                
-            3) # Testar configuração de segurança
-                show_header
-                echo -e "${COLOR_GREEN}TESTE DE CONFIGURAÇÃO DE SEGURANÇA${COLOR_RESET}\n"
-                
-                echo -e "${COLOR_YELLOW}Verificando configurações de segurança...${COLOR_RESET}\n"
-                
-                # Verificar cada módulo
-                for module in "${MODULES[@]}"; do
-                    echo -e "${COLOR_BLUE}=== TESTANDO MÓDULO: ${module^^} ===${COLOR_RESET}"
+                if [[ "$confirm" =~ ^[Ss][IiMm]?$ ]]; then
+                    echo -e "\n${COLOR_YELLOW}Atualizando scripts...${COLOR_RESET}"
                     
-                    # Carregar módulo
-                    if ! load_module "$module"; then
-                        echo -e "${COLOR_RED}❌ Módulo $module não encontrado ou com erros${COLOR_RESET}\n"
+                    # Fazer backup das alterações locais
+                    echo -e "\n${COLOR_BLUE}Fazendo backup das alterações locais...${COLOR_RESET}"
+                    git stash save "Alterações locais antes da atualização em $(date +'%Y-%m-%d %H:%M:%S')"
+                    
+                    # Atualizar o repositório
+                    echo -e "\n${COLOR_BLUE}Atualizando repositório...${COLOR_RESET}"
+                    git fetch origin "$current_branch"
+                    
+                    if [ $? -ne 0 ]; then
+                        error "Falha ao buscar atualizações do repositório remoto."
+                        read -p "Pressione Enter para continuar..."
                         continue
                     fi
                     
-                    # Executar teste de segurança do módulo
-                    case $module in
-                        "ssh")
-                            check_ssh_security
-                            ;;
-                        "ufw")
-                            check_ufw_security
-                            ;;
-                        "fail2ban")
-                            check_fail2ban_security
-                            ;;
-                        *)
-                            echo -e "${COLOR_YELLOW}⚠️  Teste de segurança não disponível para o módulo $module${COLOR_RESET}\n"
-                            ;;
-                    esac
-                done
-                
-                echo -e "${COLOR_GREEN}✅ Teste de configuração de segurança concluído!${COLOR_RESET}\n"
+                    # Verificar se há atualizações disponíveis
+                    LOCAL=$(git rev-parse @)
+                    REMOTE=$(git rev-parse "@\{u\}")
+                    
+                    if [ "$LOCAL" = "$REMOTE" ]; then
+                        echo -e "\n${COLOR_GREEN}✅ Seus scripts já estão atualizados!${COLOR_RESET}"
+                        read -p "Pressione Enter para continuar..."
+                        continue
+                    fi
+                    
+                    # Aplicar as atualizações
+                    echo -e "\n${COLOR_BLUE}Aplicando atualizações...${COLOR_RESET}"
+                    git reset --hard "origin/$current_branch"
+                    
+                    if [ $? -ne 0 ]; then
+                        error "Falha ao aplicar as atualizações."
+                        read -p "Pressione Enter para continuar..."
+                        continue
+                    fi
+                    
+                    # Tornar os scripts executáveis
+                    echo -e "\n${COLOR_BLUE}Configurando permissões...${COLOR_RESET}"
+                    chmod +x *.sh
+                    
+                    echo -e "\n${COLOR_GREEN}✅ Scripts atualizados com sucesso!${COLOR_RESET}"
+                    echo -e "${COLOR_YELLOW}Reinicie o script para aplicar as alterações.${COLOR_RESET}"
+                    exit 0
+                else
+                    echo -e "\n${COLOR_YELLOW}Atualização cancelada pelo usuário.${COLOR_RESET}"
+                    read -p "Pressione Enter para continuar..."
+                fi
                 ;;
                 
-            4) # Atualizar scripts
-                show_header
-                echo -e "${COLOR_GREEN}ATUALIZAR SCRIPTS${COLOR_RESET}\n"
+            2) # Gerar Relatório Detalhado
+                generate_security_report
+                ;;
                 
-                echo -e "${COLOR_YELLOW}Verificando atualizações disponíveis...${COLOR_RESET}\n"
+            3) # Limpar Dados Temporários
+                echo -e "\n${COLOR_BLUE}=== LIMPAR DADOS TEMPORÁRIOS ===${COLOR_RESET}\n"
                 
-                # Aqui você implementaria a lógica para verificar e baixar atualizações
-                # Por exemplo, de um repositório Git
+                echo -e "${COLOR_RED}⚠️  ATENÇÃO: Esta operação irá remover arquivos temporários e caches.${COLOR_RESET}\n"
                 
-                echo -e "${COLOR_YELLOW}Esta funcionalidade ainda não foi implementada.${COLOR_RESET}"
-                echo -e "${COLOR_YELLOW}Por favor, consulte a documentação para obter instruções de atualização.${COLOR_RESET}\n"
+                read -p "Tem certeza que deseja continuar? (s/N): " confirm
+                
+                if [[ "$confirm" =~ ^[Ss][IiMm]?$ ]]; then
+                    echo -e "\n${COLOR_YELLOW}Limpando dados temporários...${COLOR_RESET}"
+                    
+                    # Limpar cache do apt
+                    if command -v apt-get &> /dev/null; then
+                        echo -e "\n${COLOR_BLUE}Limpando cache do apt...${COLOR_RESET}"
+                        apt-get clean
+                        apt-get autoclean
+                    fi
+                    
+                    # Limpar logs antigos
+                    echo -e "\n${COLOR_BLUE}Limpando logs antigos...${COLOR_RESET}"
+                    find /var/log -type f -name "*.gz" -delete
+                    find /var/log -type f -name "*.log.*" -delete
+                    
+                    # Limpar diretórios temporários
+                    echo -e "\n${COLOR_BLUE}Limpando diretórios temporários...${COLOR_RESET}"
+                    rm -rf /tmp/*
+                    rm -rf /var/tmp/*
+                    
+                    echo -e "\n${COLOR_GREEN}✅ Limpeza concluída com sucesso!${COLOR_RESET}"
+                else
+                    echo -e "\n${COLOR_YELLOW}Operação cancelada pelo usuário.${COLOR_RESET}"
+                fi
+                
+                read -p "Pressione Enter para continuar..."
+                ;;
+                
+            4) # Verificar Dependências
+                echo -e "\n${COLOR_BLUE}=== VERIFICAR DEPENDÊNCIAS ===${COLOR_RESET}\n"
+                
+                check_dependencies
+                
+                read -p "Pressione Enter para continuar..."
                 ;;
                 
             0) # Voltar
@@ -500,15 +815,11 @@ advanced_tools() {
                 
             *)
                 error "Opção inválida. Tente novamente."
+                read -p "Pressione Enter para continuar..."
                 ;;
         esac
-        
-        read -p "Pressione Enter para continuar..."
     done
 }
-
-# Função para executar comandos do sistema
-run_command() {
     local cmd="$1"
     local description="${2:-Executando comando}"
     
