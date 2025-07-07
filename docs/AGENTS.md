@@ -40,7 +40,26 @@ Todo script deve começar com um bloco de cabeçalho bem estruturado, incluindo:
 ########################################################################
 ```
 
-## 2. Comentários e Mensagens
+## 2. Limites de Tamanho e Modularização
+
+### 2.1 Tamanho Máximo de Arquivos
+- **521 linhas**: Limite absoluto para qualquer arquivo de código fonte
+  - Se um arquivo se aproximar de 400 linhas, já deve ser considerada a modularização
+  - Arquivos que ultrapassarem 521 linhas devem ser imediatamente refatorados
+
+### 2.2 Tamanho de Chunks de Análise
+- **300 linhas**: Tamanho máximo recomendado para chunks de análise
+  - Facilita revisão de código
+  - Melhora a legibilidade
+  - Permite melhor paralelização de tarefas
+
+### 2.3 Diretrizes de Modularização
+1. **Separação por Responsabilidade**: Divida o código em módulos lógicos
+2. **Funções Específicas**: Cada função deve ter uma única responsabilidade
+3. **Arquivos de Módulos**: Use a estrutura de pastas para organizar funcionalidades relacionadas
+4. **Documentação Clara**: Cada módulo deve ter documentação adequada
+
+## 3. Comentários e Mensagens
 - Use comentários claros antes de blocos lógicos relevantes.
 - Sempre explique decisões não triviais.
 - Mensagens para o usuário humano devem ser:
