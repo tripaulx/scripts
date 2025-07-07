@@ -1,0 +1,25 @@
+---
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+      - name: ShellCheck
+        run: |
+          set -euo pipefail
+          shellcheck -x $(git ls-files '*.sh')
+      - name: Run integration tests
+        run: |
+          set -euo pipefail
+          sudo ./run-tests.sh

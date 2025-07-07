@@ -360,7 +360,7 @@ unlock_user_account() {
     if ! usermod -U "${username}"; then
         log "error" "Falha ao desbloquear a conta do usuário '${username}'"
         return 1
-    }
+    fi
     
     # Remover a expiração da senha
     chage -E -1 "${username}"
