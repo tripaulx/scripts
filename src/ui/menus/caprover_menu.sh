@@ -101,7 +101,30 @@ install_caprover() {
     
 
     # Dependências já verificadas pelo check_dependencies.sh
-    
+
+    # Verificar Node.js e npm
+    if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+        show_message "info" "Node.js ou npm não encontrados. Instalando Node.js LTS..."
+        if curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - >/dev/null 2>&1 && \
+           apt-get install -y nodejs >/dev/null 2>&1; then
+            show_message "success" "Node.js instalado com sucesso."
+        else
+            show_message "error" "Falha ao instalar Node.js."
+            return 1
+        fi
+    fi
+
+    # Instalar CapRover CLI
+    if ! npm list -g --depth=0 caprover >/dev/null 2>&1; then
+        show_message "info" "Instalando CapRover CLI..."
+        if npm install -g caprover >/dev/null 2>&1; then
+            show_message "success" "CapRover CLI instalada com sucesso."
+        else
+            show_message "error" "Falha ao instalar CapRover CLI."
+            return 1
+        fi
+    fi
+
     # Instalar CapRover
     show_message "info" "Iniciando instalação do CapRover..."
     caprover serversetup
