@@ -16,10 +16,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
       - name: ShellCheck
-        run: |
-          set -e
-          shellcheck $(git ls-files '*.sh')
+        run: shellcheck $(git ls-files '*.sh')
       - name: Run integration tests
-        run: |
-          set -e
-          ./run-tests.sh
+        run: ./run-tests.sh
