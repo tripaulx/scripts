@@ -6,14 +6,17 @@
 # ===================================================================
 
 # Carregar funções do core
-# shellcheck source=../../core/utils.sh
-source "$(dirname "${BASH_SOURCE[0]}")/../../core/utils.sh"
-# shellcheck source=../../core/validations.sh
-source "$(dirname "${BASH_SOURCE[0]}")/../../core/validations.sh"
-# shellcheck source=../../core/security.sh
-source "$(dirname "${BASH_SOURCE[0]}")/../../core/security.sh"
-# shellcheck source=./validations.sh
-source "$(dirname "${BASH_SOURCE[0]}")/validations.sh"
+# Carregar utilitários padronizados
+if [ -f "$(dirname "${BASH_SOURCE[0]}")/../../../src/security/core/security_utils.sh" ]; then
+    source "$(dirname "${BASH_SOURCE[0]}")/../../../src/security/core/security_utils.sh"
+else
+    echo "[CI][ERRO] Não foi possível carregar security_utils.sh" >&2
+    exit 1
+fi
+
+if [ -f "$(dirname "${BASH_SOURCE[0]}")/../../../src/security/modules/ssh/ssh_utils.sh" ]; then
+    source "$(dirname "${BASH_SOURCE[0]}")/../../../src/security/modules/ssh/ssh_utils.sh"
+fi
 
 # Variáveis de configuração
 SSH_CONFIG_FILE="/etc/ssh/sshd_config"

@@ -34,6 +34,35 @@ Este arquivo serve como índice para todos os aprendizados, problemas e soluçõ
 - **Solução:** Reforço explícito no `AGENTS.md` (checklist obrigatório) e no `README.md` (seção destacada) de que toda alteração relevante DEVE ser documentada no `review.md` antes de qualquer commit ou PR, seguindo o padrão do índice.
 - **Aprendizado:** Documentação disciplinada e visível é essencial para qualidade, rastreabilidade e onboarding eficiente. O fluxo de revisão e aprendizado deve ser obrigatório e auditável para todo o time.
 
+### 2025-07-08
+- **Problema:** Necessidade de documentar próximos passos e checklist ShellCheck/sourcing robusto para garantir continuidade após reinício do computador.
+- **Solução:** Documentação de próximos passos e checklist para garantir continuidade após reinício do computador.
+- **Aprendizado:** Documentação disciplinada e visível é essencial para qualidade, rastreabilidade e onboarding eficiente.
+
+## [2025-07-08] ShellCheck & Sourcing - Próximos Passos
+
+**Resumo do ciclo:**
+- Corrigir sourcing de core/utils.sh, core/validations.sh, core/security.sh em scripts como fail2ban.sh, trocando por security_utils.sh e *_utils.sh padronizados.
+- Padronizar sourcing em todos os módulos para usar apenas utilitários existentes.
+- Corrigir sourcing em configure_users.sh, configure_ufw.sh, configure_fail2ban.sh, configure_ssh.sh, etc.
+- Revisar sourcing nos utilitários para garantir uso correto de security_utils.sh.
+- Executar ShellCheck e validar ausência de SC1091.
+- Documentar cada ciclo no agents_review antes de commit/PR.
+
+**Arquivos prioritários:**
+- modules/fail2ban/fail2ban.sh
+- src/security/modules/users/configure_users.sh
+- src/security/modules/firewall/configure_ufw.sh
+- src/security/modules/fail2ban/configure_fail2ban.sh
+- src/security/modules/ssh/configure_ssh.sh
+- utilitários associados (*_utils.sh)
+
+Checklist para retomada após reinício:
+- [ ] Corrigir sourcing dos scripts listados
+- [ ] Validar com ShellCheck
+- [ ] Atualizar documentação de revisão
+- [ ] Confirmar CI limpo
+
 ---
 
 Adicione sempre novas entradas acima desta linha.
