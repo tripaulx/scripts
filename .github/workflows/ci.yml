@@ -27,7 +27,14 @@ jobs:
       - name: Lint scripts with ShellCheck
         run: |
           sudo apt-get update && sudo apt-get install -y shellcheck
-          shellcheck $(find . -type f -name '*.sh')
+          shellcheck -x $(find . -type f -name '*.sh')
+      - name: Check sourced scripts existence
+        run: |
+          for f in $(grep -hoP "source +['\"]?\K[^ '\"]+" $(find . -type f -name '*.sh') | sort -u); do
+            if ! [ -f "$f" ]; then
+              echo "Sourced script $f does not exist!" && exit 1
+            fi
+          done
       - name: Run integration tests
         run: |
           set -euo pipefail

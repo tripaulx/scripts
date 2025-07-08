@@ -17,4 +17,11 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y shellcheck
       - name: Run ShellCheck
         run: |
-          find . -type f -name '*.sh' -exec shellcheck --severity=style --color=always {} +
+          shellcheck -x $(find . -type f -name '*.sh')
+      - name: Check sourced scripts existence
+        run: |
+          for f in $(grep -hoP "source +['\"]?\K[^ '\"]+" $(find . -type f -name '*.sh') | sort -u); do
+            if ! [ -f "$f" ]; then
+              echo "Sourced script $f does not exist!" && exit 1
+            fi
+          done
