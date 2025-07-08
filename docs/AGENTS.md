@@ -317,3 +317,20 @@ Dúvidas ou sugestões? Consulte o responsável pelo projeto ou abra uma issue/d
   bash --version
   # Se for menor que 4, instale com brew install bash (macOS) ou sudo apt install bash (Linux)
   ```
+
+# 8. Regras Obrigatórias de ShellCheck e Boas Práticas de Shell
+
+Todos os scripts deste repositório DEVEM seguir as seguintes regras obrigatórias para garantir qualidade, segurança e compatibilidade:
+
+- **Evite if [ $? -ne 0 ]; then**
+  - Use sempre: `if ! comando; then` para checagem de erro.
+- **Nunca deixe exit 1 inatingível**
+  - Remova ou ajuste fluxos para que `exit 1` só seja executado em caso real de erro.
+- **Sempre faça cotações em substituições de comando**
+  - Exemplo: `var="$(comando)"` (e nunca sem aspas).
+- **Nunca use cat file | grep**
+  - Use: `grep padrão arquivo` diretamente.
+- **Feche todos os blocos**
+  - Sempre garanta que `fi`, `done`, `}` estejam presentes e corretamente alinhados.
+- **Use ShellCheck**
+  - Todos os scripts devem passar com
