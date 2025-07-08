@@ -322,6 +322,9 @@ Dúvidas ou sugestões? Consulte o responsável pelo projeto ou abra uma issue/d
 
 ## Checklist obrigatório para novos scripts Shell
 - **Todo novo script ou alteração relevante DEVE passar limpo pelo ShellCheck** (sem warnings ou errors, exceto SC1091 se justificado por includes dinâmicos do projeto).
+- **É OBRIGATÓRIO registrar toda alteração relevante no arquivo `agents_review/review.md` antes de qualquer commit ou pull request.**
+  - Sempre adicione uma entrada contendo: Data, Problema, Solução aplicada e Aprendizado/takeaway, conforme padrão do índice.
+  - Não submeta código sem documentação correspondente no `review.md`.
 - **Antes de qualquer pull request, execute ShellCheck localmente e corrija todos os avisos:**
   - SC2181: Não use if [ $? -ne 0 ]; prefira if ! comando; then
   - SC2046/SC2086: Sempre coloque aspas em substituições de comando e expansões de variáveis

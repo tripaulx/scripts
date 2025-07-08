@@ -6,6 +6,20 @@
 
 ---
 
+## 🚨 Registro obrigatório de mudanças
+
+> **ATENÇÃO:**
+> Toda alteração relevante (bugfix, refatoração, nova feature, ajuste de pipeline ou CI/CD) DEVE ser registrada no arquivo `agents_review/review.md` **antes de qualquer commit ou pull request**.
+> 
+> O registro deve conter:
+> - Data
+> - Descrição do problema
+> - Solução aplicada
+> - Aprendizado/takeaway
+> - (Opcional) Link para arquivo detalhado
+>
+> Siga sempre o padrão do índice do agents_review.
+
 ## 📚 Documentação Principal
 
 - [Onboarding](docs/ONBOARDING.md): Instalação e configuração inicial

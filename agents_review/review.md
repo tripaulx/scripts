@@ -29,6 +29,11 @@ Este arquivo serve como índice para todos os aprendizados, problemas e soluçõ
 - **Solução:** Padronização dos comandos de `source` para uso de caminhos absolutos robustos, com logging do caminho e erro claro, garantindo compatibilidade local e CI/CD.
 - **Aprendizado:** Sempre garantir sourcing robusto e documentar o caminho tentado para facilitar debug em ambientes variados. Documentação e logging são essenciais para rastreabilidade e manutenção do pipeline.
 
+### 2025-07-08
+- **Problema:** Colaboradores eventualmente esqueciam de registrar aprendizados, problemas e soluções no `agents_review/review.md` antes de commits ou PRs, prejudicando rastreabilidade e cultura de melhoria contínua.
+- **Solução:** Reforço explícito no `AGENTS.md` (checklist obrigatório) e no `README.md` (seção destacada) de que toda alteração relevante DEVE ser documentada no `review.md` antes de qualquer commit ou PR, seguindo o padrão do índice.
+- **Aprendizado:** Documentação disciplinada e visível é essencial para qualidade, rastreabilidade e onboarding eficiente. O fluxo de revisão e aprendizado deve ser obrigatório e auditável para todo o time.
+
 ---
 
 Adicione sempre novas entradas acima desta linha.
