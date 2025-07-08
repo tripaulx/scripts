@@ -68,38 +68,45 @@ readonly LOG_FILE="/var/log/security_setup_$(date +%Y%m%d_%H%M%S).log"
 # Configurações
 declare -a ERRORS=()
 
-# Carregar funções utilitárias
-if [ ! -d "${SETUP_UTILS_DIR}" ]; then
-    echo "Erro: Diretório de utilitários não encontrado: ${SETUP_UTILS_DIR}" >&2
-    exit 1
-fi
-
-# Carregar módulos necessários
-for module in "load_module.sh" "parse_arguments.sh" "main_functions.sh"; do
-    if [ -f "${SETUP_UTILS_DIR}/${module}" ]; then
-        source "${SETUP_UTILS_DIR}/${module}" || {
-            echo "Erro ao carregar módulo: ${module}" >&2
-            exit 1
-        }
-    else
-        echo "Erro: Módulo não encontrado: ${module}" >&2
+main() {
+    # Carregar funções utilitárias
+    if [ ! -d "${SETUP_UTILS_DIR}" ]; then
+        echo "Erro: Diretório de utilitários não encontrado: ${SETUP_UTILS_DIR}" >&2
         exit 1
     fi
-done
 
-log "error" "Foram encontrados ${#ERRORS[@]} erros durante a execução:"
+    # Carregar módulos necessários
+    for module in "load_module.sh" "parse_arguments.sh" "main_functions.sh"; do
+        if [ -f "${SETUP_UTILS_DIR}/${module}" ]; then
+            source "${SETUP_UTILS_DIR}/${module}" || {
+                echo "Erro ao carregar módulo: ${module}" >&2
+                exit 1
+            }
+        else
+            echo "Erro: Módulo não encontrado: ${module}" >&2
+            exit 1
+        fi
+    done
+
+    # Aqui você pode adicionar a lógica principal de execução dos módulos
+    # Exemplo fictício:
+    local success=0
+    # ... execução dos módulos e preenchimento de ERRORS[] ...
+
+    if [ ${#ERRORS[@]} -gt 0 ]; then
+        log "error" "Foram encontrados ${#ERRORS[@]} erros durante a execução:"
         for error in "${ERRORS[@]}"; do
             echo "  - ${error}" >&2
         done
-    
+    fi
+
     if [ ${success} -eq 0 ]; then
         log "success" "Todos os módulos foram executados com sucesso"
     else
         log "error" "Alguns módulos falharam durante a execução"
     fi
-    
+
     log "info" "Log completo disponível em: ${LOG_FILE}"
-    
     return ${success}
 }
 
