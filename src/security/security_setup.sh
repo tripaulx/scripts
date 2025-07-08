@@ -86,11 +86,11 @@ for module in "load_module.sh" "parse_arguments.sh" "main_functions.sh"; do
         exit 1
     fi
 done
-        log "error" "Foram encontrados ${#ERRORS[@]} erros durante a execução:"
+
+log "error" "Foram encontrados ${#ERRORS[@]} erros durante a execução:"
         for error in "${ERRORS[@]}"; do
             echo "  - ${error}" >&2
         done
-    fi
     
     if [ ${success} -eq 0 ]; then
         log "success" "Todos os módulos foram executados com sucesso"
