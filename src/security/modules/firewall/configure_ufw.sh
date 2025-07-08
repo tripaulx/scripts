@@ -119,9 +119,7 @@ configure_ufw() {
     # Fazer backup da configuração atual
     log "info" "Criando backup da configuração atual..."
     local backup_dir
-    backup_dir=$(backup_ufw_config)
-    
-    if [ $? -ne 0 ]; then
+    if ! backup_dir=$(backup_ufw_config); then
         log "error" "Falha ao criar backup da configuração do UFW"
         return 1
     fi

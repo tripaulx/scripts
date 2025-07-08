@@ -135,7 +135,7 @@ show_summary() {
         done
     fi
     
-    if [ ${exit_code} -eq 0 ]; then
+        if [ "${exit_code}" -eq 0 ]; then
         log "success" "Todos os módulos foram executados com sucesso"
     else
         log "error" "Alguns módulos falharam durante a execução"

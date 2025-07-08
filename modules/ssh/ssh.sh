@@ -127,7 +127,7 @@ enable_public_key_auth() {
     if ! update_config_file "$SSH_CONFIG_FILE" "^\s*PubkeyAuthentication\s" "PubkeyAuthentication yes"; then
         error "Falha ao habilitar a autenticação por chave pública no SSH."
         return 1
-    }
+    fi
     
     log "SUCCESS" "Autenticação por chave pública no SSH habilitada com sucesso."
     return 0
@@ -135,7 +135,8 @@ enable_public_key_auth() {
 
 # Função para configurar o banner do SSH
 setup_ssh_banner() {
-    local banner_content="\n==================================================\n\tAcesso Autorizado Apenas\n\tData: $(date +"%d/%m/%Y %H:%M:%S")\n==================================================\n\nAviso de Segurança:\nEste é um sistema de computador privado. O acesso não autorizado é proibido por lei.\nTodas as atividades neste sistema são monitoradas e registradas.\n"
+    local banner_content
+    banner_content="\n==================================================\n\tAcesso Autorizado Apenas\n\tData: $(date +"%d/%m/%Y %H:%M:%S")\n==================================================\n\nAviso de Segurança:\nEste é um sistema de computador privado. O acesso não autorizado é proibido por lei.\nTodas as atividades neste sistema são monitoradas e registradas.\n"
     
     log "INFO" "Configurando banner do SSH..."
     
@@ -149,7 +150,7 @@ setup_ssh_banner() {
     if ! chmod 644 "$SSH_BANNER_FILE" || ! chown root:root "$SSH_BANNER_FILE"; then
         error "Falha ao definir permissões no arquivo de banner do SSH."
         return 1
-    }
+    fi
     
     # Fazer backup do arquivo de configuração atual
     if ! backup_file "$SSH_CONFIG_FILE" "$SSH_BAK_FILE"; then
@@ -317,31 +318,31 @@ secure_ssh() {
     if ! configure_ssh_security_params; then
         error "Falha ao configurar os parâmetros de segurança do SSH."
         return 1
-    }
+    fi
     
     # Desabilitar login root
     if ! disable_root_login; then
         error "Falha ao desabilitar o login root via SSH."
         return 1
-    }
+    fi
     
     # Desabilitar autenticação por senha
     if ! disable_password_auth; then
         error "Falha ao desabilitar a autenticação por senha no SSH."
         return 1
-    }
+    fi
     
     # Habilitar autenticação por chave pública
     if ! enable_public_key_auth; then
         error "Falha ao habilitar a autenticação por chave pública no SSH."
         return 1
-    }
+    fi
     
     # Configurar banner
     if ! setup_ssh_banner; then
         error "Falha ao configurar o banner do SSH."
         return 1
-    }
+    fi
     
     # Adicionar usuário à lista de usuários permitidos, se fornecido
     if [ -n "$username" ]; then
@@ -355,7 +356,7 @@ secure_ssh() {
     if ! restart_ssh_service; then
         error "Falha ao reiniciar o serviço SSH."
         return 1
-    }
+    fi
     
     log "SUCCESS" "Configuração de segurança do SSH concluída com sucesso!"
     return 0

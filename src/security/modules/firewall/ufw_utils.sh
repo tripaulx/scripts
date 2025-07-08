@@ -24,9 +24,7 @@ else
     exit 1
 fi
 
-# Caminho para o arquivo de configuração do UFW
-readonly UFW_BEFORE_RULES="/etc/ufw/before.rules"
-readonly UFW_DEFAULT="/etc/default/ufw"
+
 
 #
 # is_ufw_installed
@@ -239,25 +237,25 @@ allow_port() {
     local port="$1"
     local protocol="${2:-tcp}"
     local comment="${3:-}"
-    local rule="allow"
-    
+    local -a rule_args=()
+
     # Validar parâmetros
     if [ -z "${port}" ]; then
         log "error" "Número da porta não especificado"
         return 1
     fi
-    
+
     # Adicionar comentário se fornecido
     if [ -n "${comment}" ]; then
-        rule="${rule} comment '${comment}'"
+        rule_args+=("comment" "${comment}")
     fi
-    
+
     # Adicionar regra
-    if ! ufw allow "${port}/${protocol}" ${rule}; then
+    if ! ufw allow "${port}/${protocol}" "${rule_args[@]}"; then
         log "error" "Falha ao adicionar regra para a porta ${port}/${protocol}"
         return 1
     fi
-    
+
     log "info" "Regra adicionada: permissão para ${port}/${protocol}${comment:+ (${comment})}"
     return 0
 }
@@ -281,25 +279,25 @@ deny_port() {
     local port="$1"
     local protocol="${2:-tcp}"
     local comment="${3:-}"
-    local rule="deny"
-    
+    local -a rule_args=()
+
     # Validar parâmetros
     if [ -z "${port}" ]; then
         log "error" "Número da porta não especificado"
         return 1
     fi
-    
+
     # Adicionar comentário se fornecido
     if [ -n "${comment}" ]; then
-        rule="${rule} comment '${comment}'"
+        rule_args+=("comment" "${comment}")
     fi
-    
+
     # Adicionar regra
-    if ! ufw deny "${port}/${protocol}" ${rule}; then
+    if ! ufw deny "${port}/${protocol}" "${rule_args[@]}"; then
         log "error" "Falha ao adicionar regra de negação para a porta ${port}/${protocol}"
         return 1
     fi
-    
+
     log "info" "Regra de negação adicionada: ${port}/${protocol}${comment:+ (${comment})}"
     return 0
 }
@@ -323,25 +321,25 @@ allow_ip() {
     local ip="$1"
     local port="$2"
     local protocol="${3:-tcp}"
-    local rule="allow from ${ip}"
-    
+    local -a rule_args=("allow" "from" "${ip}")
+
     # Validar parâmetros
     if [ -z "${ip}" ]; then
         log "error" "Endereço IP não especificado"
         return 1
     fi
-    
+
     # Adicionar porta se fornecida
     if [ -n "${port}" ]; then
-        rule="${rule} to any port ${port} proto ${protocol}"
+        rule_args+=("to" "any" "port" "${port}" "proto" "${protocol}")
     fi
-    
+
     # Adicionar regra
-    if ! ufw ${rule}; then
+    if ! ufw "${rule_args[@]}"; then
         log "error" "Falha ao adicionar regra para o IP ${ip}"
         return 1
     fi
-    
+
     log "info" "Regra adicionada: permissão para ${ip}${port:+ na porta ${port}/${protocol}}"
     return 0
 }
@@ -365,25 +363,25 @@ deny_ip() {
     local ip="$1"
     local port="$2"
     local protocol="${3:-tcp}"
-    local rule="deny from ${ip}"
-    
+    local -a rule_args=("deny" "from" "${ip}")
+
     # Validar parâmetros
     if [ -z "${ip}" ]; then
         log "error" "Endereço IP não especificado"
         return 1
     fi
-    
+
     # Adicionar porta se fornecida
     if [ -n "${port}" ]; then
-        rule="${rule} to any port ${port} proto ${protocol}"
+        rule_args+=("to" "any" "port" "${port}" "proto" "${protocol}")
     fi
-    
+
     # Adicionar regra
-    if ! ufw ${rule}; then
+    if ! ufw "${rule_args[@]}"; then
         log "error" "Falha ao adicionar regra de negação para o IP ${ip}"
         return 1
     fi
-    
+
     log "info" "Regra de negação adicionada: ${ip}${port:+ na porta ${port}/${protocol}}"
     return 0
 }

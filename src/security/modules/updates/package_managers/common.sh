@@ -87,6 +87,8 @@ detect_package_manager() {
 #   1 - Falha ao atualizar a lista de pacotes
 #
 update_package_list() {
+    # Atualiza lista de pacotes eliminando uso indireto de $? (SC2181)
+
     local package_manager
     package_manager=$(detect_package_manager)
     
@@ -94,30 +96,40 @@ update_package_list() {
     
     case "${package_manager}" in
         apt)
-            apt-get update
+            if ! apt-get update; then
+                log "error" "Falha ao atualizar a lista de pacotes (apt)"
+                return 1
+            fi
             ;;
         yum)
-            yum check-update -y
+            if ! yum check-update -y; then
+                log "error" "Falha ao atualizar a lista de pacotes (yum)"
+                return 1
+            fi
             ;;
         dnf)
-            dnf check-update -y
+            if ! dnf check-update -y; then
+                log "error" "Falha ao atualizar a lista de pacotes (dnf)"
+                return 1
+            fi
             ;;
         zypper)
-            zypper refresh
+            if ! zypper refresh; then
+                log "error" "Falha ao atualizar a lista de pacotes (zypper)"
+                return 1
+            fi
             ;;
         pacman)
-            pacman -Syy
+            if ! pacman -Syy; then
+                log "error" "Falha ao atualizar a lista de pacotes (pacman)"
+                return 1
+            fi
             ;;
         *)
             log "error" "Gerenciador de pacotes não suportado: ${package_manager}"
             return 1
             ;;
     esac
-    
-    if [ $? -ne 0 ]; then
-        log "error" "Falha ao atualizar a lista de pacotes"
-        return 1
-    fi
     
     log "info" "Lista de pacotes atualizada com sucesso"
     return 0
@@ -133,6 +145,8 @@ update_package_list() {
 #   Lista de pacotes com atualizações de segurança
 #
 get_security_updates() {
+    # Elimina SC2181 usando captura direta de saída
+
     local package_manager
     package_manager=$(detect_package_manager)
     
@@ -140,32 +154,28 @@ get_security_updates() {
     
     case "${package_manager}" in
         apt)
-            apt list --upgradable 2>/dev/null | grep -i security | cut -d'/' -f1
+            updates=$(apt list --upgradable 2>/dev/null | grep -i security | cut -d'/' -f1) || true
             ;;
         yum)
-            yum updateinfo list security -y 2>/dev/null | grep '^FIXED'
+            updates=$(yum updateinfo list security -y 2>/dev/null | grep '^FIXED') || true
             ;;
         dnf)
-            dnf updateinfo list security -y 2>/dev/null | grep '^FIXED'
+            updates=$(dnf updateinfo list security -y 2>/dev/null | grep '^FIXED') || true
             ;;
         zypper)
-            zypper list-patches --category security 2>/dev/null
+            updates=$(zypper list-patches --category security 2>/dev/null) || true
             ;;
         pacman)
-            pacman -Qu 2>/dev/null | grep -i security
+            updates=$(pacman -Qu 2>/dev/null | grep -i security) || true
             ;;
         *)
             log "error" "Gerenciador de pacotes não suportado: ${package_manager}"
             return 1
             ;;
     esac
-    
-    if [ $? -ne 0 ]; then
-        log "error" "Falha ao verificar atualizações de segurança"
-        return 1
-    fi
-    
-    return 0
+
+    printf '%s
+' "${updates}"
 }
 
 #
@@ -182,6 +192,8 @@ get_security_updates() {
 #   1 - Falha ao instalar as atualizações
 #
 install_security_updates() {
+    # Remove SC2181 e corrige quoting SC2046/2086
+
     local auto_confirm="${1:-no}"
     local package_manager
     package_manager=$(detect_package_manager)
@@ -191,7 +203,6 @@ install_security_updates() {
     # Verificar se há atualizações de segurança disponíveis
     local security_updates
     security_updates=$(get_security_updates)
-    
     if [ -z "${security_updates}" ]; then
         log "info" "Nenhuma atualização de segurança disponível"
         return 0
@@ -213,30 +224,40 @@ install_security_updates() {
     # Instalar as atualizações de segurança
     case "${package_manager}" in
         apt)
-            apt-get install --only-upgrade $(echo "${security_updates}" | tr '\n' ' ')
+            if ! apt-get install --only-upgrade "$(echo "${security_updates}" | tr '\n' ' ')"; then
+                log "error" "Falha ao instalar atualizações (apt)"
+                return 1
+            fi
             ;;
         yum)
-            yum update --security -y
+            if ! yum update --security -y; then
+                log "error" "Falha ao instalar atualizações (yum)"
+                return 1
+            fi
             ;;
         dnf)
-            dnf upgrade --security -y
+            if ! dnf upgrade --security -y; then
+                log "error" "Falha ao instalar atualizações (dnf)"
+                return 1
+            fi
             ;;
         zypper)
-            zypper patch --category security -y
+            if ! zypper patch --category security -y; then
+                log "error" "Falha ao instalar atualizações (zypper)"
+                return 1
+            fi
             ;;
         pacman)
-            pacman -Syu --noconfirm
+            if ! pacman -Syu --noconfirm; then
+                log "error" "Falha ao instalar atualizações (pacman)"
+                return 1
+            fi
             ;;
         *)
             log "error" "Gerenciador de pacotes não suportado: ${package_manager}"
             return 1
             ;;
     esac
-    
-    if [ $? -ne 0 ]; then
-        log "error" "Falha ao instalar as atualizações de segurança"
-        return 1
-    fi
     
     log "info" "Atualizações de segurança instaladas com sucesso"
     return 0

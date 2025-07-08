@@ -118,7 +118,8 @@ run_diagnostic() {
     
     # Oferecer para salvar o relatório
     if confirm_action "Deseja salvar este relatório em um arquivo?"; then
-        local default_file="diagnostico_$(hostname)_$(date +"%Y%m%d_%H%M%S").log"
+        local default_file
+        default_file="diagnostico_$(hostname)_$(date +"%Y%m%d_%H%M%S").log"
         read -rp "Digite o caminho do arquivo [$default_file]: " save_path
         save_path="${save_path:-$default_file}"
         
@@ -148,8 +149,7 @@ show_monitoring() {
     if ! command -v htop &> /dev/null; then
         show_message "warning" "O comando 'htop' não está instalado. Deseja instalar agora?"
         if confirm_action "Instalar htop?"; then
-            apt-get update && apt-get install -y htop
-            if [ $? -ne 0 ]; then
+            if ! { apt-get update && apt-get install -y htop; }; then
                 show_message "error" "Falha ao instalar o htop."
                 return 1
             fi

@@ -5,7 +5,7 @@
 # ===================================================================
 
 # Carregar funções utilitárias
-# shellcheck source=utils.sh
+# shellcheck source=core/utils.sh
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 # Função para verificar dependências do sistema
@@ -22,7 +22,11 @@ check_dependencies() {
     if [ ${#missing[@]} -gt 0 ]; then
         warn "Dependências ausentes: ${missing[*]}"
         if confirm_action "Deseja instalar as dependências ausentes?" "y"; then
-            apt-get update && apt-get install -y "${missing[@]}" || error "Falha ao instalar dependências"
+            if apt-get update && apt-get install -y "${missing[@]}"; then
+                :
+            else
+                error "Falha ao instalar dependências"
+            fi
         else
             error "Dependências necessárias não atendidas"
         fi

@@ -18,11 +18,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/validations.sh"
 # Variáveis de configuração
 FAIL2BAN_CONFIG_DIR="/etc/fail2ban"
 FAIL2BAN_JAIL_LOCAL="${FAIL2BAN_CONFIG_DIR}/jail.local"
-FAIL2BAN_JAIL_DEFAULT="${FAIL2BAN_CONFIG_DIR}/jail.d/defaults-debian.conf"
-FAIL2BAN_FILTER_DIR="${FAIL2BAN_CONFIG_DIR}/filter.d"
-FAIL2BAN_ACTION_DIR="${FAIL2BAN_CONFIG_DIR}/action.d"
 FAIL2BAN_SERVICE="fail2ban"
-FAIL2BAN_LOGFILE="/var/log/fail2ban.log"
 
 # Função para instalar o Fail2Ban
 install_fail2ban() {
@@ -94,9 +90,9 @@ configure_fail2ban_basic() {
 
 # Função para configurar proteção SSH
 configure_ssh_protection() {
-    local max_retry=${1:-3}
-    local bantime=${2:-'24h'}
-    local findtime=${3:-'10m'}
+    local max_retry=3
+    local bantime='24h'
+    local findtime='10m'
     
     log "INFO" "Configurando proteção SSH no Fail2Ban..."
     
@@ -158,7 +154,7 @@ configure_service_protection() {
         log "INFO" "Atualizando configuração existente para o serviço $service..."
         
         # Atualizar configurações existentes
-        update_config_file "$FAIL2AN_JAIL_LOCAL" "^\s*enabled\s*=\" "enabled = true"
+        update_config_file "$FAIL2BAN_JAIL_LOCAL" "^\s*enabled\s*=" "enabled = true"
         
         if [ -n "$port" ]; then
             update_config_file "$FAIL2BAN_JAIL_LOCAL" "^\s*port\s*=" "port = $port"
@@ -395,7 +391,7 @@ secure_fail2ban() {
     if ! configure_ssh_protection; then
         error "Falha ao configurar proteção SSH no Fail2Ban."
         return 1
-    }
+    fi
     
     # Configurar proteção para serviços comuns
     local common_services=(

@@ -42,9 +42,7 @@ apt_update_package_list() {
         return 1
     fi
     
-    apt-get update
-    
-    if [ $? -ne 0 ]; then
+    if ! apt-get update; then
         log "error" "Falha ao atualizar a lista de pacotes (APT)"
         return 1
     fi
@@ -70,12 +68,12 @@ apt_get_security_updates() {
         return 1
     fi
     
-    apt list --upgradable 2>/dev/null | grep -i security | cut -d'/' -f1
-    
-    if [ $? -ne 0 ]; then
-        log "error" "Falha ao verificar atualizações de segurança (APT)"
+    local updates
+    updates=$(apt list --upgradable 2>/dev/null | grep -i security | cut -d'/' -f1) || true
+    if [ -z "$updates" ]; then
         return 1
     fi
+    printf '%s\n' "$updates"
     
     return 0
 }
@@ -126,9 +124,7 @@ apt_install_security_updates() {
     fi
     
     # Instalar as atualizações de segurança
-    apt-get install --only-upgrade $(echo "${security_updates}" | tr '\n' ' ')
-    
-    if [ $? -ne 0 ]; then
+    if ! apt-get install --only-upgrade "$(echo "${security_updates}" | tr '\n' ' ')"; then
         log "error" "Falha ao instalar as atualizações de segurança (APT)"
         return 1
     fi

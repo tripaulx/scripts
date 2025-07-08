@@ -152,7 +152,7 @@ show_progress() {
     
     echo -n "${message} "
     
-    while ps -p $pid > /dev/null 2>&1; do
+        while ps -p "$pid" > /dev/null 2>&1; do
         local temp=${spinstr#?}
         printf "[%c]" "$spinstr"
         local spinstr=$temp${spinstr%"$temp"}

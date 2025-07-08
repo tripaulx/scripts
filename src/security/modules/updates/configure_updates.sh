@@ -155,7 +155,7 @@ check_system_updates() {
                 ;;
         esac
         
-        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+        if [ "${PIPESTATUS[0]}" -ne 0 ]; then
             log "info" "Nenhuma atualização disponível"
             return 1
         fi
@@ -230,7 +230,7 @@ install_updates() {
         esac
     fi
     
-    if [ $? -ne 0 ]; then
+    if ! install_updates_command; then
         log "error" "Falha ao instalar as atualizações"
         return 1
     fi
@@ -282,7 +282,8 @@ check_reboot_required() {
         # Mostrar pacotes que requerem reinicialização, se disponível
         if [ -f "/var/run/reboot-required.pkgs" ]; then
             log "info" "Pacotes que requerem reinicialização:"
-            cat "/var/run/reboot-required.pkgs" | sed 's/^/  /'
+            # Substituir cat | sed por sed diretamente
+            sed 's/^/  /' "/var/run/reboot-required.pkgs"
         fi
         
         return 0
@@ -312,7 +313,7 @@ main() {
     if [ $# -eq 0 ]; then
         show_help
         exit 1
-    fi
+    fi  # SC2317: nenhum código após exit
     
     # Processar argumentos
     while [ $# -gt 0 ]; do
@@ -363,7 +364,7 @@ main() {
                 log "error" "Opção inválida: $1"
                 show_help
                 exit 1
-                ;;
+                ;;  # SC2317: nenhum código após exit
         esac
     done
     

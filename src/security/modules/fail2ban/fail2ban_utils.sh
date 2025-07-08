@@ -130,7 +130,8 @@ backup_fail2ban_config() {
     # Fazer backup dos arquivos
     for item in "${fail2ban_files[@]}"; do
         if [ -e "${item}" ]; then
-            local dest="${backup_dir}/$(basename "${item}")"
+            local dest
+            dest="${backup_dir}/$(basename "${item}")"
             
             if [ -d "${item}" ]; then
                 if ! cp -r "${item}" "${backup_dir}/"; then

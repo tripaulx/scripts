@@ -36,7 +36,7 @@ NC='\033[0m' # No Color
 
 # Variáveis
 INSTALL_MODE=false
-LIST_ONLY=false
+
 MISSING_DEPS=()
 INSTALLED_DEPS=()
 FAILED_DEPS=()
@@ -324,10 +324,7 @@ main() {
                 INSTALL_MODE=true
                 shift
                 ;;
-            --list)
-                LIST_ONLY=true
-                shift
-                ;;
+
             --help|-h)
                 show_help
                 exit 0

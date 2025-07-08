@@ -133,9 +133,7 @@ configure_fail2ban() {
     if ${dry_run}; then
         log "info" "[DRY RUN] Backup seria criado em /etc/fail2ban/backup_*"
     else
-        backup_dir=$(backup_fail2ban_config)
-        
-        if [ $? -ne 0 ]; then
+        if ! backup_dir=$(backup_fail2ban_config); then
             log "error" "Falha ao criar backup da configuração do Fail2Ban"
             return 1
         fi

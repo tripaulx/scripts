@@ -183,7 +183,8 @@ create_backup() {
     fi
     
     local backup_dir="/backups/caprover"
-    local timestamp=$(date +"%Y%m%d_%H%M%S")
+    local timestamp
+    timestamp=$(date +"%Y%m%d_%H%M%S")
     local backup_file="caprover_backup_$timestamp.tar"
     
     mkdir -p "$backup_dir"
@@ -209,7 +210,7 @@ restore_backup() {
     
     local backup_dir="/backups/caprover"
     
-    if [ ! -d "$backup_dir" ] || [ -z "$(ls -A "$backup_dir" 2>/dev/null | grep '\.tar$')" ]; then
+    if ! compgen -G "${backup_dir}/*.tar" > /dev/null; then
         show_message "warning" "Nenhum arquivo de backup encontrado em $backup_dir"
         return 1
     fi

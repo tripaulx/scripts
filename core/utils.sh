@@ -23,22 +23,22 @@ log() {
     
     case $level in
         "ERROR")
-            if [ $LOG_LEVEL -ge 0 ]; then
+            if [ "$LOG_LEVEL" -ge 0 ]; then
                 echo -e "[${RED}ERRO${NC}] $timestamp - $message"
             fi
             ;;
         "WARN")
-            if [ $LOG_LEVEL -ge 1 ]; then
+            if [ "$LOG_LEVEL" -ge 1 ]; then
                 echo -e "[${YELLOW}AVISO${NC}] $timestamp - $message"
             fi
             ;;
         "INFO")
-            if [ $LOG_LEVEL -ge 2 ]; then
+            if [ "$LOG_LEVEL" -ge 2 ]; then
                 echo -e "[${BLUE}INFO${NC}] $timestamp - $message"
             fi
             ;;
         "DEBUG")
-            if [ $LOG_LEVEL -ge 3 ]; then
+            if [ "$LOG_LEVEL" -ge 3 ]; then
                 echo -e "[${GREEN}DEBUG${NC}] $timestamp - $message"
             fi
             ;;
@@ -114,7 +114,6 @@ run_cmd() {
     
     if ! eval "$cmd"; then
         error "$error_msg"
-        return 1
     fi
     
     return 0

@@ -14,11 +14,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../core/validations.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/../../core/security.sh"
 
 # Variáveis de configuração
-UFW_CONFIG_FILE="/etc/default/ufw"
 UFW_SERVICE="ufw"
 UFW_BEFORE_RULES_FILE="/etc/ufw/before.rules"
-UFW_AFTER_RULES_FILE="/etc/ufw/after.rules"
-UFW_USER_RULES_FILE="/etc/ufw/user.rules"
 
 # Função para verificar se o UFW está instalado
 check_ufw_installed() {
@@ -98,7 +95,7 @@ check_port_open() {
     if ! is_valid_port "$port"; then
         error "Número de porta inválido: $port"
         return 1
-    }
+    fi
     
     # Verificar se o UFW está ativado
     if ! check_ufw_enabled; then
@@ -124,7 +121,7 @@ check_port_closed() {
     if ! is_valid_port "$port"; then
         error "Número de porta inválido: $port"
         return 1
-    }
+    fi
     
     # Verificar se o UFW está ativado
     if ! check_ufw_enabled; then
@@ -280,7 +277,7 @@ check_ufw_security() {
         # Verificar proteção contra força bruta
         if ! check_bruteforce_protection; then
             log "INFO" "Recomendado configurar proteção contra força bruta no UFW."
-        }
+        fi
     fi
     
     if [ "$result" -eq 0 ]; then

@@ -42,7 +42,8 @@ load_module() {
     local module="$1"
     shift
     local module_script="${MODULES_DIR}/${module}/configure_${module}.sh"
-    local module_log="/var/log/security_${module}_$(date +%Y%m%d_%H%M%S).log"
+    local module_log
+    module_log="/var/log/security_${module}_$(date +%Y%m%d_%H%M%S).log"
     local start_time end_time duration
     
     start_time=$(date +%s)
@@ -77,6 +78,7 @@ load_module() {
         
         # Carregar funções utilitárias de segurança
         if [ -f "${CORE_DIR}/security_utils.sh" ]; then
+            # shellcheck disable=SC1091
             source "${CORE_DIR}/security_utils.sh"
         else
             log "error" "Não foi possível carregar security_utils.sh"
@@ -87,6 +89,7 @@ load_module() {
         set -o pipefail
         
         log "info" "Carregando módulo: ${module_script}"
+        # shellcheck disable=SC1090
         source "${module_script}" || {
             log "error" "Falha ao carregar o módulo: ${module_script}"
             return 1
@@ -96,7 +99,7 @@ load_module() {
         if ! declare -f "configure_${module}" > /dev/null; then
             log "error" "Função 'configure_${module}' não encontrada no módulo"
             return 1
-        }
+        fi
         
         # Executar a função principal do módulo
         log "info" "Executando função: configure_${module} $*"
@@ -108,7 +111,7 @@ load_module() {
             log "success" "Módulo '${module}' concluído com sucesso"
         else
             log "error" "Módulo '${module}' falhou com código de erro: ${result}"
-        }
+        fi
         
         return ${result}
     )
@@ -145,7 +148,7 @@ get_module_dependencies() {
     local deps_file="${MODULES_DIR}/${module}/dependencies.txt"
     
     if [ -f "${deps_file}" ]; then
-        cat "${deps_file}" | grep -v '^#' | tr '\n' ' '
+        grep -v '^#' "${deps_file}" | tr '\n' ' '
     else
         echo ""
     fi
@@ -172,13 +175,13 @@ validate_module() {
     if [ ! -f "${module_script}" ]; then
         log "error" "Arquivo do módulo não encontrado: ${module_script}"
         return 1
-    }
+    fi
     
     # Verificar se a função principal existe
     if ! grep -q "^configure_${module}()" "${module_script}"; then
         log "error" "Função 'configure_${module}' não encontrada no módulo"
         return 1
-    }
+    fi
     
     return 0
 }

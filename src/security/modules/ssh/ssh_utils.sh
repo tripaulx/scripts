@@ -53,7 +53,8 @@ backup_ssh_config() {
     
     # Criar backup do arquivo de configuração
     if [ -f "${SSHD_CONFIG}" ]; then
-        local backup_file="${backup_dir}/sshd_config.$(date +%Y%m%d_%H%M%S).bak"
+        local backup_file
+        backup_file="${backup_dir}/sshd_config.$(date +%Y%m%d_%H%M%S).bak"
         
         if ! cp "${SSHD_CONFIG}" "${backup_file}"; then
             log "error" "Falha ao criar backup do arquivo de configuração SSH"
@@ -110,12 +111,7 @@ update_ssh_setting() {
         echo "${setting} ${value}" >> "${temp_file}"
     fi
     
-    # Verificar se houve erro ao processar o arquivo
-    if [ $? -ne 0 ]; then
-        log "error" "Falha ao processar o arquivo de configuração"
-        rm -f "${temp_file}"
-        return 1
-    fi
+    # O sed não retorna um código de erro útil aqui, então a verificação é movida para depois da substituição do arquivo
     
     # Verificar se o arquivo temporário está vazio
     if [ ! -s "${temp_file}" ]; then

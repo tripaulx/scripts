@@ -214,7 +214,7 @@ check_security_updates() {
         # Para sistemas baseados em Debian/Ubuntu
         apt-get update >/dev/null 2>&1
         local updates
-        updates=$(apt-get -s dist-upgrade | grep -i security | wc -l)
+        updates=$(apt-get -s dist-upgrade | grep -ci security)
         
         if [ "$updates" -gt 0 ]; then
             log "WARN" "$updates atualizações de segurança disponíveis. Execute 'apt-get upgrade' para instalá-las."
@@ -226,7 +226,7 @@ check_security_updates() {
     elif command -v yum >/dev/null 2>&1; then
         # Para sistemas baseados em RHEL/CentOS
         local updates
-        updates=$(yum updateinfo list security all 2>/dev/null | grep -i 'update(s) needed' | wc -l)
+        updates=$(yum updateinfo list security all 2>/dev/null | grep -ci 'update(s) needed')
         
         if [ "$updates" -gt 0 ]; then
             log "WARN" "$updates atualizações de segurança disponíveis. Execute 'yum update --security' para instalá-las."

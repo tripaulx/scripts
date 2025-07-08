@@ -191,7 +191,7 @@ deny_port() {
     if ! is_valid_port "$port"; then
         error "Número de porta inválido: $port"
         return 1
-    }
+    fi
     
     # Verificar se a regra já existe
     if ufw status | grep -q "^${port}/${protocol}.*DENY"; then
@@ -409,7 +409,7 @@ secure_ufw() {
     if ! allow_port 443 tcp "HTTPS"; then
         error "Falha ao permitir a porta HTTPS (443/tcp) no UFW."
         return 1
-    end
+    fi
     
     # Habilitar proteção contra ataques de força bruta
     if ! configure_ufw_bruteforce_protection; then
@@ -425,7 +425,7 @@ secure_ufw() {
     if ! restart_ufw; then
         error "Falha ao recarregar as regras do UFW."
         return 1
-    end
+    fi
     
     log "SUCCESS" "Configuração de segurança do UFW concluída com sucesso!"
     return 0

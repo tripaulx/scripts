@@ -34,7 +34,7 @@ readonly COLOR_RESET="\e[0m"
 readonly COLOR_RED="\e[31m"
 readonly COLOR_GREEN="\e[32m"
 readonly COLOR_YELLOW="\e[33m"
-readonly COLOR_BLUE="\e[34m"
+
 
 # Variáveis de controle
 VERBOSE=false
@@ -43,7 +43,8 @@ HAS_WARNINGS=false
 HAS_ERRORS=false
 
 # Caminhos importantes
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly LOG_DIR="/var/log/security_setup"
 readonly CACHE_DIR="/var/cache/security_setup"
 
@@ -331,7 +332,7 @@ else
     log "debug" "Script carregado com 'source', executando inicialização..."
     if ! main "$@"; then
         log "error" "Falha na inicialização do ambiente"
-        return 1 2>/dev/null || exit 1
+        return 1
     fi
     
     # Exportar variáveis de ambiente

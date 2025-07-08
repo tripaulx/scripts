@@ -110,7 +110,6 @@ parse_arguments() {
     # Verificar se não há argumentos
     if [ $# -eq 0 ]; then
         show_help
-        exit 1
     fi
     
     # Processar argumentos
@@ -201,7 +200,7 @@ parse_arguments() {
                 log "error" "Opção inválida: $1"
                 show_help
                 exit 1
-                ;;
+                ;;  # SC2317: nenhum código após exit
         esac
     done
     
@@ -215,7 +214,7 @@ parse_arguments() {
         
         log "info" "Criando usuário: ${username}"
         if [ ${dry_run} -eq 0 ]; then
-            create_user "${username}" "${fullname}" "${shell}" "${home_dir}" || exit 1
+            create_user "${username}" "${fullname}" "${shell}" "${home_dir}" || exit 1  # SC2317: nenhum código após exit
             
             # Definir senha se fornecida
             if [ -n "${password}" ]; then
@@ -239,9 +238,7 @@ parse_arguments() {
         log "info" "Definindo senha para o usuário: ${username}"
         if [ ${dry_run} -eq 0 ]; then
             local new_password
-            new_password=$(set_user_password "${username}" "${password}")
-            
-            if [ $? -eq 0 ]; then
+            if new_password=$(set_user_password "${username}" "${password}"); then
                 log "info" "Senha definida com sucesso para o usuário: ${username}"
                 if [ -z "${password}" ]; then
                     log "info" "Senha gerada: ${new_password}"
@@ -269,7 +266,7 @@ parse_arguments() {
         
         log "info" "Adicionando usuário ${username} aos grupos: ${groups}"
         if [ ${dry_run} -eq 0 ]; then
-            add_user_to_group "${username}" "${groups}" $([ ${create_groups} -eq 1 ] && echo "create") || exit 1
+            add_user_to_group "${username}" "${groups}" "$([ ${create_groups} -eq 1 ] && echo "create")" || exit 1
         else
             log "info" "[DRY RUN] Adicionar usuário ${username} aos grupos: ${groups}"
             if [ ${create_groups} -eq 1 ]; then

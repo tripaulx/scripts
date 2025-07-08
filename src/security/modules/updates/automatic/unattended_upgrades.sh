@@ -68,7 +68,7 @@ install_unattended_upgrades() {
     log "info" "Configurando arquivo ${config_file}"
     
     # Criar ou atualizar o arquivo de configuração
-    cat > "${config_file}" << EOF
+    if ! cat > "${config_file}" << EOF
 // Atualizar a lista de pacotes a cada dia
 APT::Periodic::Update-Package-Lists "1";
 // Instalar atualizações automaticamente
@@ -80,8 +80,7 @@ APT::Periodic::AutocleanInterval "7";
 // Exibir informações detalhadas
 APT::Periodic::Verbose "1";
 EOF
-    
-    if [ $? -ne 0 ]; then
+    then
         log "error" "Falha ao configurar o arquivo ${config_file}"
         return 1
     fi
@@ -98,7 +97,7 @@ EOF
     fi
     
     # Configurar atualizações automáticas
-    cat > "${unattended_file}" << 'EOF'
+    if ! cat > "${unattended_file}" << 'EOF'
 // Configurações para atualizações automáticas não supervisionadas
 Unattended-Upgrade::Allowed-Origins {
     // Atualizações de segurança
@@ -147,8 +146,7 @@ Unattended-Upgrade::InstallOnShutdown "false";
 Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
 Unattended-Upgrade::Remove-New-Unused-Dependencies "true";
 EOF
-    
-    if [ $? -ne 0 ]; then
+    then
         log "error" "Falha ao configurar o arquivo ${unattended_file}"
         return 1
     fi

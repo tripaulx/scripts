@@ -414,13 +414,13 @@ remove_ssh_key() {
     if [ -z "$username" ] || [ -z "$ssh_key" ]; then
         error "Nome de usuário e chave SSH são obrigatórios."
         return 1
-    }
+    fi
     
     # Verificar se o usuário existe
     if ! id "$username" &>/dev/null; then
         error "O usuário $username não existe."
         return 1
-    }
+    fi
     
     # Obter o diretório home do usuário
     local user_home

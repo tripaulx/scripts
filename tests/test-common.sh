@@ -14,7 +14,7 @@ TOTAL_TESTS=0
 PASSED_TESTS=0
 FAILED_TESTS=0
 SKIPPED_TESTS=0
-CURRENT_TEST=""
+
 
 # Inicializar testes
 init_tests() {
@@ -36,7 +36,6 @@ run_tests() {
     init_tests "$suite_name" "$@"
     
     for test_func in "${TEST_FUNCTIONS[@]}"; do
-        CURRENT_TEST="$test_func"
         echo -e "\n${YELLOW}Executando: ${test_func}${NC}"
         
         if ! command -v "$test_func" >/dev/null 2>&1; then

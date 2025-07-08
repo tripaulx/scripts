@@ -219,7 +219,7 @@ test_module_loading() {
         fi
         
         # Testar função de relatório (deve funcionar sem alterações no sistema)
-        if ! ${module}_main report; then
+        if ! "${module}_main" report; then
             log "WARNING" "Falha ao gerar relatório do módulo ${module}"
             # Não falha o teste, apenas registra um aviso
         fi
@@ -279,7 +279,7 @@ main() {
     
     # Verificar dependências
     log "INFO" "Verificando dependências..."
-    if ! check_dependencies; then
+    if ! check_dependencies "$@"; then
         log "WARNING" "Algumas dependências estão ausentes, alguns testes podem falhar"
     fi
     

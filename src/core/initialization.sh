@@ -28,7 +28,7 @@ export COLOR_MAGENTA="\e[35m"
 export COLOR_CYAN="\e[36m"
 
 # Variáveis globais
-declare -g VERBOSE=false
+
 
 echo "Verificando e criando diretórios necessários..."
 mkdir -p "$(dirname "$0")/../../logs"
@@ -54,7 +54,8 @@ check_root() {
 #   Carrega as configurações do sistema a partir de arquivos de configuração.
 #
 load_config() {
-    local config_file="$(dirname "$0")/../../config/settings.conf"
+    local config_file
+    config_file="$(dirname "$0")/../../config/settings.conf"
     
     if [ -f "$config_file" ]; then
         # shellcheck source=/dev/null

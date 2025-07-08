@@ -41,7 +41,7 @@ reboot_if_required() {
         # Mostrar pacotes que requerem reinicialização, se disponível
         if [ -f "/var/run/reboot-required.pkgs" ]; then
             log "info" "Pacotes que requerem reinicialização:"
-            cat "/var/run/reboot-required.pkgs" | sed 's/^/  /'
+            sed 's/^/  /' "/var/run/reboot-required.pkgs"
         fi
         
         return 0

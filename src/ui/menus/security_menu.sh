@@ -84,8 +84,7 @@ configure_firewall() {
     if ! command -v ufw &> /dev/null; then
         show_message "warning" "UFW não está instalado. Deseja instalar agora?"
         if confirm_action "Instalar UFW?"; then
-            apt-get update && apt-get install -y ufw
-            if [ $? -ne 0 ]; then
+            if ! { apt-get update && apt-get install -y ufw; }; then
                 show_message "error" "Falha ao instalar o UFW."
                 return 1
             fi
@@ -173,7 +172,7 @@ run_hardening() {
     if confirm_action "Isso aplicará configurações de segurança avançadas. Deseja continuar?"; then
         show_message "info" "Iniciando processo de hardening..."
         # Simular hardening
-        for i in {1..5}; do
+                for _ in {1..5}; do
             echo -n "."
             sleep 0.5
         done

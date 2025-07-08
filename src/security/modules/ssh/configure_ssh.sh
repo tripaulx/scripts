@@ -213,7 +213,9 @@ generate_ssh_key_for_user() {
     fi
     
     # Adicionar chave pública se ainda não estiver lá
-    if ! grep -q "$(cat "${public_key}" | cut -d' ' -f2)" "${auth_keys}" 2>/dev/null; then
+    local pubkey_value
+    pubkey_value=$(cut -d' ' -f2 < "${public_key}")
+    if ! grep -q "$pubkey_value" "${auth_keys}" 2>/dev/null; then
         cat "${public_key}" >> "${auth_keys}"
         log "info" "Chave pública adicionada ao arquivo authorized_keys"
     else

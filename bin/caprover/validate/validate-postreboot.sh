@@ -32,7 +32,7 @@ fi
 LOGFILE="validate-postreboot-$(date +%Y%m%d-%H%M%S).log"
 
 banner() {
-  echo "\n==================== $1 ===================="
+  printf "\n==================== %s ====================\n" "$1"
 }
 
 banner "Diagnóstico Pós-Reboot"
@@ -196,7 +196,11 @@ swapon --show | tee -a "$LOGFILE"
 
 # Conectividade
 banner "Conectividade"
-ping -c 2 8.8.8.8 && echo "[OK] Internet funcionando" || echo "[ERRO] Sem conectividade externa!" | tee -a "$LOGFILE"
+if ping -c 2 8.8.8.8; then
+    echo "[OK] Internet funcionando"
+  else
+    echo "[ERRO] Sem conectividade externa!" | tee -a "$LOGFILE"
+  fi
 
 # Logs recentes de erro
 banner "Logs recentes do sistema"

@@ -19,7 +19,10 @@
 # Data: 2025-07-07
 
 # Caminho base para os submódulos
-readonly UPDATES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC2155
+_UPDATES_DIR_TMP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly UPDATES_DIR="${_UPDATES_DIR_TMP}"
+unset _UPDATES_DIR_TMP
 
 # Carregar funções utilitárias de segurança
 if [ -f "${UPDATES_DIR}/../../core/security_utils.sh" ]; then
@@ -142,34 +145,44 @@ update_package_list() {
     package_manager=$(detect_package_manager)
     
     log "info" "Atualizando lista de pacotes (${package_manager})"
-    
+
     case "${package_manager}" in
         apt)
-            apt-get update
+            if ! apt-get update; then
+                log "error" "Falha ao atualizar a lista de pacotes (apt)"
+                return 1
+            fi
             ;;
         yum)
-            yum check-update -y
+            if ! yum check-update -y; then
+                log "error" "Falha ao atualizar a lista de pacotes (yum)"
+                return 1
+            fi
             ;;
         dnf)
-            dnf check-update -y
+            if ! dnf check-update -y; then
+                log "error" "Falha ao atualizar a lista de pacotes (dnf)"
+                return 1
+            fi
             ;;
         zypper)
-            zypper refresh
+            if ! zypper refresh; then
+                log "error" "Falha ao atualizar a lista de pacotes (zypper)"
+                return 1
+            fi
             ;;
         pacman)
-            pacman -Syy
+            if ! pacman -Syy; then
+                log "error" "Falha ao atualizar a lista de pacotes (pacman)"
+                return 1
+            fi
             ;;
         *)
             log "error" "Gerenciador de pacotes não suportado: ${package_manager}"
             return 1
             ;;
     esac
-    
-    if [ $? -ne 0 ]; then
-        log "error" "Falha ao atualizar a lista de pacotes"
-        return 1
-    fi
-    
+
     log "info" "Lista de pacotes atualizada com sucesso"
     return 0
 }
@@ -210,12 +223,12 @@ get_security_updates() {
             return 1
             ;;
     esac
-    
-    if [ $? -ne 0 ]; then
+
+    if ! check_security_updates; then
         log "error" "Falha ao verificar atualizações de segurança"
         return 1
     fi
-    
+
     return 0
 }
 
@@ -264,7 +277,7 @@ install_security_updates() {
     # Instalar as atualizações de segurança
     case "${package_manager}" in
         apt)
-            apt-get install --only-upgrade $(echo "${security_updates}" | tr '\n' ' ')
+            apt-get install --only-upgrade "$(echo "${security_updates}" | tr '\n' ' ')"
             ;;
         yum)
             yum update --security -y
@@ -284,7 +297,7 @@ install_security_updates() {
             ;;
     esac
     
-    if [ $? -ne 0 ]; then
+    if ! install_security_updates_command; then
         log "error" "Falha ao instalar as atualizações de segurança"
         return 1
     fi
@@ -322,7 +335,7 @@ install_unattended_upgrades() {
         log "info" "Instalando dependências necessárias"
         apt-get update && apt-get install -y unattended-upgrades apt-listchanges
         
-        if [ $? -ne 0 ]; then
+        if ! apt-get update && apt-get install -y unattended-upgrades apt-listchanges; then
             log "error" "Falha ao instalar as dependências necessárias"
             return 1
         fi
@@ -399,7 +412,7 @@ EOF
     systemctl enable unattended-upgrades
     systemctl restart unattended-upgrades
     
-    if [ $? -ne 0 ]; then
+    if ! systemctl enable unattended-upgrades && systemctl restart unattended-upgrades; then
         log "error" "Falha ao iniciar o serviço de atualizações automáticas"
         return 1
     fi
@@ -471,7 +484,9 @@ reboot_if_required() {
     # Verificar se o arquivo /var/run/reboot-required existe (sistemas baseados em Debian/Ubuntu)
     if [ -f "/var/run/reboot-required" ]; then
         log "warning" "Reinicialização necessária para concluir as atualizações"
-        cat "/var/run/reboot-required.pkgs" 2>/dev/null || true
+        if [ -f "/var/run/reboot-required.pkgs" ]; then
+            sed 's/^/  /' "/var/run/reboot-required.pkgs"
+        fi
         return 0
     fi
     
@@ -523,7 +538,7 @@ schedule_reboot() {
     fi
     
     # Agendar a reinicialização
-    if shutdown -r ${when} "${message}"; then
+    if shutdown -r "${when}" "${message}"; then
         log "info" "Reinicialização agendada com sucesso para daqui a ${when}"
         
         # Notificar os usuários conectados

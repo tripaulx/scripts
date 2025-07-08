@@ -46,7 +46,7 @@ VULNERABILIDADE_CRITICA=0
 header() {
   echo -e "\n${BLUE}${BOLD}🔍 $1${NC}"
   echo "$1" >> "$LOGFILE"
-  echo "$(printf '%*s' ${#1} | tr ' ' '=')" >> "$LOGFILE"
+  printf '%*s\n' "${#1}" '' | tr ' ' '=' >> "$LOGFILE"
 }
 
 # Função para exibir status com emoji
@@ -91,9 +91,7 @@ fi
 
 # 1. Verificar portas abertas
 header "🔍 PORTAS ABERTAS"
-PORTA_22=$(ss -tuln | grep ':22 ' || true)
-PORTA_80=$(ss -tuln | grep ':80 ' || true)
-PORTA_443=$(ss -tuln | grep ':443 ' || true)
+
 
 ss -tuln | tee -a "$LOGFILE"
 

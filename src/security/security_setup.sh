@@ -51,19 +51,16 @@
 # Encerrar em caso de erro
 set -euo pipefail
 
-# Cores para saída
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
-readonly BLUE='\033[0;34m'
-readonly NC='\033[0m' # No Color
+
 
 # Caminhos importantes
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly CORE_DIR="${SCRIPT_DIR}/core"
-readonly MODULES_DIR="${SCRIPT_DIR}/modules"
+
 readonly SETUP_UTILS_DIR="${CORE_DIR}/setup_utils"
-readonly LOG_FILE="/var/log/security_setup_$(date +%Y%m%d_%H%M%S).log"
+readonly LOG_FILE
+LOG_FILE="/var/log/security_setup_$(date +%Y%m%d_%H%M%S).log"
 
 # Configurações
 declare -a ERRORS=()
@@ -78,6 +75,7 @@ main() {
     # Carregar módulos necessários
     for module in "load_module.sh" "parse_arguments.sh" "main_functions.sh"; do
         if [ -f "${SETUP_UTILS_DIR}/${module}" ]; then
+            # shellcheck disable=SC1090
             source "${SETUP_UTILS_DIR}/${module}" || {
                 echo "Erro ao carregar módulo: ${module}" >&2
                 exit 1

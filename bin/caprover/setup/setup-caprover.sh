@@ -109,7 +109,7 @@ echo "[INFO][$(date '+%Y-%m-%d %H:%M:%S')] Script iniciado por: $(whoami)"
 
 # Confirmação do usuário
 if [[ $FORCE -eq 0 ]]; then
-    read -p "⚠️  Confirma que deseja limpar TODO o ambiente Docker deste servidor? (y/N): " CONFIRMA
+    read -r -p "⚠️  Confirma que deseja limpar TODO o ambiente Docker deste servidor? (y/N): " CONFIRMA
     if [[ ! "$CONFIRMA" =~ ^[Yy]$ ]]; then
         echo "[INFO][$(date '+%Y-%m-%d %H:%M:%S')] Operação cancelada pelo usuário."
         exit 0
@@ -125,7 +125,7 @@ MIN_DISK_GB=2
 TIMESTAMP() { date '+%Y-%m-%d %H:%M:%S'; }
 
 banner() {
-    echo "\n====================================================="
+    printf "\n=====================================================\n"
     echo "$1"
     echo "====================================================="
 }
@@ -142,7 +142,7 @@ echo "🖥️  Diagnóstico do Sistema:"
 echo "  - Hostname: $(hostname)"
 echo "  - Kernel: $(uname -a)"
 echo "  - Uptime: $(uptime -p)"
-echo "  - Distribuição: $(lsb_release -ds 2>/dev/null || cat /etc/os-release | grep PRETTY_NAME)"
+echo "  - Distribuição: $(lsb_release -ds 2>/dev/null || grep PRETTY_NAME /etc/os-release)"
 
 # Diagnóstico docker info
 echo ""
@@ -161,7 +161,7 @@ docker service ls || echo "(Swarm inativo)"
 # Snapshot dos logs do Docker para auditoria
 DOCKER_LOG_SNAPSHOT="docker_logs_snapshot_$(date +%Y%m%d%H%M%S).log"
 echo "[INFO][$(date '+%Y-%m-%d %H:%M:%S')] Salvando snapshot dos logs do Docker em $DOCKER_LOG_SNAPSHOT..."
-journalctl -u docker > "$DOCKER_LOG_SNAPSHOT" 2>/dev/null || docker logs $(docker ps -q) > "$DOCKER_LOG_SNAPSHOT" 2>/dev/null || echo "[WARN][$(date '+%Y-%m-%d %H:%M:%S')] Não foi possível capturar logs do Docker."
+journalctl -u docker > "$DOCKER_LOG_SNAPSHOT" 2>/dev/null || docker logs "$(docker ps -q)" > "$DOCKER_LOG_SNAPSHOT" 2>/dev/null || echo "[WARN][$(date '+%Y-%m-%d %H:%M:%S')] Não foi possível capturar logs do Docker."
 
 # 15. Backup opcional do /captain se existir
 if [ -d /captain ]; then
@@ -218,7 +218,7 @@ echo ""
 echo "🔍 Diagnóstico de processos ocupando portas críticas:"
 for P in "${PORTAS[@]}"; do
     echo "Porta $P:"
-    lsof -i :$P || echo "   - Porta $P livre."
+    lsof -i :"$P" || echo "   - Porta $P livre."
 done
 
 # 4. Checagem de portas em uso
@@ -241,7 +241,7 @@ for P in "${PORTAS[@]}"; do
         PID=$(echo "$PROC_INFO" | awk -F',' '{print $2}' | awk -F'=' '{print $2}' | awk '{print $1}')
         if [ -n "$PID" ]; then
             echo "[$(date '+%Y-%m-%d %H:%M:%S')] Tentando finalizar processo PID=$PID usando porta $P..."
-            kill -9 $PID && echo "[$(date '+%Y-%m-%d %H:%M:%S')] Processo $PID finalizado." || echo "[$(date '+%Y-%m-%d %H:%M:%S')] Falha ao finalizar processo $PID."
+            kill -9 "$PID" && echo "[$(date '+%Y-%m-%d %H:%M:%S')] Processo $PID finalizado." || echo "[$(date '+%Y-%m-%d %H:%M:%S')] Falha ao finalizar processo $PID."
         else
             echo "[$(date '+%Y-%m-%d %H:%M:%S')] Não foi possível identificar o PID do processo. Libere manualmente a porta $P."
             PORTA_BLOQUEADA=1
@@ -385,7 +385,7 @@ else
 fi
 
 echo ""
-echo "\n🌐 Testando acesso HTTP via curl =="
+printf "\n🌐 Testando acesso HTTP via curl ==\n"
 HTTP_RESPONSE=$(curl -s "http://$IP_PUBLICO:3000")
 if echo "$HTTP_RESPONSE" | grep -q 'firewall-passed'; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] ⚠️ CapRover exibiu tela 'firewall-passed'. Diagnóstico automático iniciado."

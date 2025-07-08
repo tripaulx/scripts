@@ -16,11 +16,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../core/security.sh"
 # Variáveis de configuração
 FAIL2BAN_CONFIG_DIR="/etc/fail2ban"
 FAIL2BAN_JAIL_LOCAL="${FAIL2BAN_CONFIG_DIR}/jail.local"
-FAIL2BAN_JAIL_DEFAULT="${FAIL2BAN_CONFIG_DIR}/jail.d/defaults-debian.conf"
-FAIL2BAN_FILTER_DIR="${FAIL2BAN_CONFIG_DIR}/filter.d"
-FAIL2BAN_ACTION_DIR="${FAIL2BAN_CONFIG_DIR}/action.d"
 FAIL2BAN_SERVICE="fail2ban"
-FAIL2BAN_LOGFILE="/var/log/fail2ban.log"
 
 # Função para verificar se o Fail2Ban está instalado
 check_fail2ban_installed() {
@@ -268,7 +264,7 @@ check_fail2ban_security() {
     # Verificar configurações de segurança
     if ! check_fail2ban_security_settings; then
         result=1
-    }
+    fi
     
     # Verificar se os serviços críticos estão protegidos
     local critical_services=("sshd" "recidive")

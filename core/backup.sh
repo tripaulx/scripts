@@ -96,7 +96,8 @@ backup_directory() {
 create_restore_point() {
     local name=$1
     local description=${2:-"Ponto de restauração criado em $(date)"}
-    local snapshot_dir="${ROLLBACK_DIR}/${name}_$(date +%Y%m%d_%H%M%S)"
+    local snapshot_dir
+    snapshot_dir="${ROLLBACK_DIR}/${name}_$(date +%Y%m%d_%H%M%S)"
     
     log "INFO" "Criando ponto de restauração: $name"
     
@@ -160,7 +161,7 @@ restore_backup() {
     if [ ! -e "$backup_path" ]; then
         log "ERROR" "Arquivo de backup não encontrado: $backup_path"
         return 1
-    }
+    fi
     
     # Verificar se o diretório de destino existe (se for um diretório)
     if [ -d "$backup_path" ] && [ ! -d "$target_path" ]; then

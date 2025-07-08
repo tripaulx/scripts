@@ -141,7 +141,7 @@ set_user_password() {
         echo "${password}" | passwd --stdin "${username}" > /dev/null 2>&1
     fi
     
-    if [ $? -ne 0 ]; then
+    if ! echo "${username}:${password}" | chpasswd; then
         log "error" "Falha ao definir a senha para o usuário '${username}'"
         return 1
     fi
@@ -286,7 +286,7 @@ setup_sudo_access() {
     install -m 0440 "${temp_file}" "${sudo_file}"
     
     # Verificar se a instalação foi bem-sucedida
-    if [ $? -ne 0 ]; then
+    if ! install -m 0440 "${temp_file}" "${sudo_file}"; then
         log "error" "Falha ao instalar o arquivo de configuração sudo"
         rm -f "${temp_file}"
         return 1

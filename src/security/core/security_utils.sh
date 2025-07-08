@@ -71,8 +71,8 @@ log() {
         "error")
             if [ ${LOG_LEVEL} -le ${LOG_LEVEL_ERROR} ]; then
                 echo -e "${COLOR_RED}[${timestamp}] [ERROR] ${message}${COLOR_RESET}" >&2
-                if [ ${exit_code} -ne 0 ]; then
-                    exit ${exit_code}
+                                if [ "${exit_code}" -ne 0 ]; then
+                                        exit "${exit_code}"
                 fi
             fi
             ;;

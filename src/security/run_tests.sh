@@ -29,7 +29,7 @@ readonly COLOR_RESET="\e[0m"
 readonly COLOR_RED="\e[31m"
 readonly COLOR_GREEN="\e[32m"
 readonly COLOR_YELLOW="\e[33m"
-readonly COLOR_BLUE="\e[34m"
+
 
 # Variáveis de controle
 CLEAN_AFTER=false
