@@ -56,11 +56,14 @@ else
 fi
 
 # Carregar o módulo de atualizações
-if [ -f "${UPDATES_DIR}/update_utils.sh" ]; then
-    source "${UPDATES_DIR}/update_utils.sh"
+UTILS_PATH="${UPDATES_DIR}/update_utils.sh"
+echo "[DEBUG] Sourcing $UTILS_PATH" >&2
+if [ -f "$UTILS_PATH" ]; then
+    # shellcheck source=/dev/null
+    source "$UTILS_PATH"
     log "debug" "Módulo de atualizações carregado com sucesso"
 else
-    log "error" "Não foi possível carregar o módulo de atualizações"
+    echo "Erro: Não foi possível carregar update_utils.sh em $UTILS_PATH" >&2
     exit 1
 fi
 

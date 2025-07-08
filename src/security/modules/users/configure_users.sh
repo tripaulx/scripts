@@ -57,10 +57,13 @@ else
 fi
 
 # Carregar funções utilitárias de usuários
-if [ -f "$(dirname "$0")/user_utils.sh" ]; then
-    source "$(dirname "$0")/user_utils.sh"
+UTILS_PATH="$(dirname "$0")/user_utils.sh"
+echo "[DEBUG] Sourcing $UTILS_PATH" >&2
+if [ -f "$UTILS_PATH" ]; then
+    # shellcheck source=/dev/null
+    source "$UTILS_PATH"
 else
-    log "error" "Não foi possível carregar user_utils.sh"
+    echo "Erro: Não foi possível carregar user_utils.sh em $UTILS_PATH" >&2
     exit 1
 fi
 
