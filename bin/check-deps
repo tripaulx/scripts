@@ -16,20 +16,11 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Função para verificar a versão do Bash
-check_bash_version() {
-    local required_version=4
-    local current_version
-    current_version=$(bash --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | cut -d. -f1)
-    
-    if [ "$current_version" -ge "$required_version" ]; then
-        echo -e "${GREEN}✓${NC} Bash versão $current_version (mínimo: $required_version.0)"
-        return 0
-    else
-        echo -e "${RED}✗${NC} Bash versão $current_version (necessário: $required.0+)"
-        return 1
-    fi
-}
+# Verifica versão do Bash
+if [ "$(bash --version | head -n1 | grep -oE '[0-9]+')" -lt 4 ]; then
+  echo -e "\033[0;31m[ERRO] Bash 4.0+ é obrigatório. Instale com 'brew install bash' (macOS) ou 'sudo apt install bash' (Linux).\033[0m"
+  exit 1
+fi
 
 # Função para verificar um comando
 check_command() {

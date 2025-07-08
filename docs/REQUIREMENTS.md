@@ -2,26 +2,34 @@
 
 Este documento descreve as dependências necessárias para executar os scripts de segurança e automação deste repositório.
 
+## Bash 4.0+ Obrigatório
+Todos os scripts requerem Bash 4.0 ou superior. No macOS, instale com:
+```bash
+brew install bash
+```
+No Linux:
+```bash
+sudo apt install bash
+```
+
+## Permissões de Execução
+Após clonar o repositório, execute:
+```bash
+bash post-clone-setup.sh
+```
+
 ## Dependências Principais
 
 ### Para todos os scripts
-- **Bash 4.0+** - Shell padrão para execução dos scripts
+- **Bash 4.0+**
 - **GNU Core Utilities** - Utilitários básicos do sistema (grep, sed, awk, etc.)
 - **sudo** - Para execução de comandos com privilégios elevados
 - **curl** - Para download de arquivos e verificação de conectividade
 - **jq** - Para processamento de JSON
+- **UFW** (recomendado) - Ferramenta de firewall simplificada
+- **Fail2Ban** (recomendado) - Prevenção contra força bruta
 
 ### Para módulos específicos
-
-#### Módulo UFW (Uncomplicated Firewall)
-- **ufw** - Ferramenta de firewall simplificada
-  - Ubuntu/Debian: `sudo apt install ufw`
-  - CentOS/RHEL: `sudo yum install ufw`
-
-#### Módulo Fail2Ban
-- **fail2ban** - Prevenção contra força bruta
-  - Ubuntu/Debian: `sudo apt install fail2ban`
-  - CentOS/RHEL: `sudo yum install fail2ban`
 
 #### Módulo Docker
 - **Docker** - Para execução de contêineres

@@ -1,8 +1,33 @@
 # Guia de Padrão de Documentação e Estrutura de Scripts
 
-Este documento orienta agentes (IA e humanos) sobre o padrão obrigatório para documentação e estrutura de scripts neste projeto. Siga rigorosamente para garantir legibilidade, manutenção e automação confiável.
+> **ATENÇÃO:**
+> Este projeto segue o [Unified Development and Operations Guide](../STYLE_GUIDE.md) com regras rígidas de estilo, tamanho e modularização para scripts, Python e documentação.
+>
+> **Limites obrigatórios:**
+> - **Shell scripts e arquivos Markdown:**
+>   - Máximo: **600 linhas** (refatoração obrigatória se exceder)
+>   - Refatorar a partir de 400 linhas
+>   - Chunks para IA: até 300 linhas
+> - **Python:**
+>   - Máximo: 500 linhas por arquivo
+>   - Refatorar a partir de 300 linhas
+>   - Chunks para IA: até 200 linhas
+>
+> **Markdowns extensos devem ser divididos em múltiplos arquivos.**
+> Sempre mantenha documentação modular, clara e atualizada.
+>
+> Consulte o STYLE_GUIDE.md para detalhes e exemplos.
+>
+> **Arquivamento de scripts/documentação:**
+> Scripts ou arquivos não documentados, obsoletos ou redundantes devem ser movidos para a pasta `archive/` (em vez de serem deletados diretamente). Documente o motivo do arquivamento em um README dentro de `archive/`.
 
 ---
+
+## Navegação
+- [Módulos e Scripts](MODULES.md)
+- [Testes](TESTS.md)
+- [Glossário](GLOSSARY.md)
+- [CI/CD](CI.md)
 
 ## 1. Cabeçalho Obrigatório
 Todo script deve começar com um bloco de cabeçalho bem estruturado, incluindo:
@@ -281,3 +306,14 @@ sudo SSH_PORT=2222 \
 ---
 
 Dúvidas ou sugestões? Consulte o responsável pelo projeto ou abra uma issue/documentação complementar.
+
+## Pós-clone: Permissões e Bash
+- Execute o script de pós-clone para garantir permissões:
+  ```bash
+  bash post-clone-setup.sh
+  ```
+- Verifique se o Bash 4.0+ está instalado:
+  ```bash
+  bash --version
+  # Se for menor que 4, instale com brew install bash (macOS) ou sudo apt install bash (Linux)
+  ```

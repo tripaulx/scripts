@@ -1,3 +1,4 @@
+#!/bin/bash
 
 ########################################################################
 # Script Name: setup-caprover.sh
@@ -62,6 +63,12 @@
 ########################################################################
 
 set -e
+
+# Verifica versão do Bash
+if [ "$(bash --version | head -n1 | grep -oE '[0-9]+')" -lt 4 ]; then
+  echo -e "\033[0;31m[ERRO] Bash 4.0+ é obrigatório. Instale com 'brew install bash' (macOS) ou 'sudo apt install bash' (Linux).\033[0m"
+  exit 1
+fi
 
 SCRIPT_ROOT="$(cd "$(dirname "$0")"/../../.. && pwd)"
 "${SCRIPT_ROOT}/src/security/core/check_dependencies.sh" --install

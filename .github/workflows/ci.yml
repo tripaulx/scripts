@@ -11,14 +11,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
+      - name: Ensure all .sh scripts are executable
         run: |
-          sudo apt-get update
-          sudo apt-get install -y shellcheck
-      - name: ShellCheck
+          for f in $(find . -type f -name '*.sh'); do
+            if ! [ -x "$f" ]; then
+              echo "Script $f is not executable!" && exit 1
+            fi
+          done
+      - name: Check Bash version
         run: |
-          set -euo pipefail
-          shellcheck -x $(git ls-files '*.sh')
+          bash --version | grep -q 'version [4-9]' || (echo 'Bash 4+ required' && exit 1)
+      - name: Run dependency check
+        run: |
+          ./bin/check-deps
+      - name: Lint scripts with ShellCheck
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          shellcheck $(find . -type f -name '*.sh')
       - name: Run integration tests
         run: |
           set -euo pipefail

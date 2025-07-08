@@ -13,7 +13,7 @@ Obrigado por considerar contribuir para este projeto! Este guia fornece informa�
 1. **Faça um Fork** do repositório
 2. **Clone** o repositório para sua máquina local:
    ```bash
-   git clone https://github.com/seu-usuario/scripts.git
+   git clone https://github.com/tripaulx/scripts.git
    cd scripts
    ```
 3. **Instale as Dependências** (se aplicável):

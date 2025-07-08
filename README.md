@@ -1,5 +1,25 @@
 # Gerenciamento de Servidor Debian 12
 
+> **ATENÇÃO:**
+> Este arquivo excede o limite de 600 linhas definido no STYLE_GUIDE.md.
+> Modularize e divida em múltiplos arquivos menores o quanto antes.
+
+---
+
+## 📚 Documentação Principal
+
+- [Onboarding](docs/ONBOARDING.md): Instalação e configuração inicial
+- [Uso Avançado](docs/USAGE.md): Comandos, automação e exemplos
+- [Troubleshooting & FAQ](docs/TROUBLESHOOTING.md): Problemas comuns e soluções
+- [Arquitetura](docs/ARCHITECTURE.md): Estrutura do projeto e decisões de design
+- [Práticas de Segurança](docs/SECURITY.md): Hardening, auditoria e recomendações
+- [Requisitos](docs/REQUIREMENTS.md): Dependências e compatibilidade
+- [Contribuição](docs/CONTRIBUTING.md): Guia para contribuidores
+- [Changelog](docs/CHANGELOG.md): Histórico de alterações
+- [Roadmap](docs/ROADMAP.md): Planejamento futuro
+
+---
+
 > **Compatibilidade Exclusiva:**
 > Scripts projetados e testados especificamente para **Debian 12 (Bookworm)**. 
 > ⚠️ Não há suporte para outras versões ou distribuições.
@@ -38,8 +58,8 @@ Este repositório contém um conjunto de scripts modulares para gerenciamento de
 
 ### 1. Clone o repositório
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+git clone https://github.com/tripaulx/scripts.git
+cd scripts
 ```
 
 ### 2. Dê permissão de execução
@@ -88,15 +108,6 @@ sudo ./main.sh
 - Logs centralizados
 - Backup de configurações
 
-## 📚 Documentação Completa
-
-Consulte a pasta `docs/` para documentação detalhada:
-- [Guia de Início Rápido](docs/ONBOARDING_CHECKLIST.md)
-- [Requisitos do Sistema](docs/REQUIREMENTS.md)
-- [Checklist de Segurança](docs/SECURITY_CHECKLIST.md)
-- [Plano de Desenvolvimento](docs/ROADMAP.md)
-- [Guia de Contribuição](docs/CONTRIBUTING.md)
-
 ## 🔄 Atualizações
 
 Para atualizar para a versão mais recente:
@@ -133,8 +144,8 @@ Consulte o arquivo [REQUIREMENTS.md](docs/REQUIREMENTS.md) para informações de
 
 2. **Clone o repositório**
    ```bash
-   git clone https://github.com/seu-usuario/automacao-caprover.git
-   cd automacao-caprover
+   git clone https://github.com/tripaulx/scripts.git
+   cd scripts
    ```
 
 3. **Dê permissão de execução aos scripts**
@@ -204,6 +215,22 @@ Consulte o arquivo [REQUIREMENTS.md](docs/REQUIREMENTS.md) para informações de
    ```
    - **--force**: Executa sem confirmações interativas (ideal para automação/CI).
    - As variáveis de ambiente permitem configurar domínio, senha e e-mail do admin automaticamente no wizard inicial via CLI.
+
+## 🚀 Quick Start (Após Clonar)
+
+1. **Torne todos os scripts executáveis:**
+   ```bash
+   bash post-clone-setup.sh
+   ```
+   > Isso garante que todos os scripts .sh tenham permissão de execução, mesmo em novos clones.
+
+2. **Verifique dependências:**
+   ```bash
+   ./bin/check-deps
+   ```
+
+3. **Requisito de Bash:**
+   > Todos os scripts requerem **Bash 4.0+**. No macOS, instale com `brew install bash` e execute scripts com `/usr/local/bin/bash script.sh`.
 
 ## Módulos Principais
 
@@ -489,7 +516,7 @@ Se o problema persistir, colete as seguintes informações antes de entrar em co
 resource "null_resource" "server_hardening" {
   provisioner "remote-exec" {
     inline = [
-      "git clone https://github.com/seu-usuario/automacao-caprover.git /tmp/security-scripts",
+      "git clone https://github.com/tripaulx/scripts.git /tmp/security-scripts",
       "chmod +x /tmp/security-scripts/*.sh",
       "sudo /tmp/security-scripts/main.sh --non-interactive"
     ]
