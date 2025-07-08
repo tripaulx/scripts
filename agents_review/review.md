@@ -24,6 +24,11 @@ Este arquivo serve como índice para todos os aprendizados, problemas e soluçõ
 - **Aprendizado:** Revisão contínua e modular reduz riscos, acelera validação e evita regressões. Documentar cada ciclo de aprendizado facilita manutenção e onboarding.
 - **Arquivo detalhado:** [2025-07-07-shellcheck-refactor.md](2025-07-07-shellcheck-refactor.md)
 
+### 2025-07-08
+- **Problema:** Scripts de configuração (`configure_users.sh` e `configure_updates.sh`) falhavam no CI ao tentar importar arquivos utilitários devido a caminhos relativos inconsistentes.
+- **Solução:** Padronização dos comandos de `source` para uso de caminhos absolutos robustos, com logging do caminho e erro claro, garantindo compatibilidade local e CI/CD.
+- **Aprendizado:** Sempre garantir sourcing robusto e documentar o caminho tentado para facilitar debug em ambientes variados. Documentação e logging são essenciais para rastreabilidade e manutenção do pipeline.
+
 ---
 
 Adicione sempre novas entradas acima desta linha.
