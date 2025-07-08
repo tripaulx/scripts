@@ -320,6 +320,18 @@ Dúvidas ou sugestões? Consulte o responsável pelo projeto ou abra uma issue/d
 
 # 8. Regras Obrigatórias de ShellCheck e Boas Práticas de Shell
 
+## Checklist obrigatório para novos scripts Shell
+- **Todo novo script ou alteração relevante DEVE passar limpo pelo ShellCheck** (sem warnings ou errors, exceto SC1091 se justificado por includes dinâmicos do projeto).
+- **Antes de qualquer pull request, execute ShellCheck localmente e corrija todos os avisos:**
+  - SC2181: Não use if [ $? -ne 0 ]; prefira if ! comando; then
+  - SC2046/SC2086: Sempre coloque aspas em substituições de comando e expansões de variáveis
+  - SC2317: Remova código inatingível após exit/return
+  - SC1091: Inclua diretiva # shellcheck source= se necessário, ou justifique no agents_review
+- **Documente aprendizados, problemas e soluções na pasta agents_review antes de cada PR**
+- **Prefira ciclos de revisão incremental e modular, validando cada bloco antes de avançar**
+- **Nunca submeta código que não passe pelo checklist acima**
+
+
 Todos os scripts deste repositório DEVEM seguir as seguintes regras obrigatórias para garantir qualidade, segurança e compatibilidade:
 
 - **Evite if [ $? -ne 0 ]; then**
